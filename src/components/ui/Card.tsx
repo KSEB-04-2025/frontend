@@ -1,13 +1,11 @@
-import React from "react";
+import React from 'react';
 
 export default function Card({
   children,
-  className = "",
+  className = '',
 }: {
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <div className={`bg-white p-4 rounded shadow ${className}`}>{children}</div>
-  );
+  return <div className={`rounded bg-white p-4 shadow ${className}`}>{children}</div>;
 }
