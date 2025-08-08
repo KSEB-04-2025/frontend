@@ -1,4 +1,12 @@
-import "@/app/globals.css";
+// src/app/layout.tsx
+import "./globals.css";
+import Sidebar from "@/components/sections/Sidebar";
+import HeaderBar from "@/components/sections/HeaderBar";
+
+export const metadata = {
+  title: "ZEZE ONE",
+  description: "Manufacturing Dashboard",
+};
 
 export default function RootLayout({
   children,
@@ -7,16 +15,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className="flex h-screen">
-        {/* ── 사이드바 (네비) */}
-        <aside className="hidden md:block w-64 border-r border-gray-200 p-4">
-          <div className="placeholder h-12 flex items-center justify-center">
-            NAV
-          </div>
-        </aside>
-
-        {/* ── 메인 컨텐트 */}
-        <main className="flex-1 overflow-auto">{children}</main>
+      <body className="flex h-screen bg-[#0B0E1C] text-white">
+        <Sidebar />
+        <div className="flex-1 flex flex-col overflow-auto">
+          <HeaderBar />
+          <main className="p-6">{children}</main>
+        </div>
       </body>
     </html>
   );

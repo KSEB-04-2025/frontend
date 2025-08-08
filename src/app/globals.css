@@ -1,27 +1,40 @@
+/* Google Fonts */
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap");
+
+/* Tailwind 지시자 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* CSS 변수 */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #081028;
+  --foreground: #ffffff;
   --font-sans: "Pretendard", ui-sans-serif, system-ui;
 }
 
+/* 다크 모드 (옵션) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #000000;
+    --foreground: #ffffff;
   }
 }
 
-.placeholder {
-  @apply border-2 border-dashed border-gray-300 bg-gray-50;
-}
-
+/* 전역 바디 스타일 */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 플레이스홀더 스타일 */
+.placeholder {
+  border: 2px dashed #d1d5db;
+  background-color: rgba(11, 23, 57, 0.2);
+  color: #aeb9e1;
 }
