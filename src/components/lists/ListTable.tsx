@@ -1,8 +1,7 @@
-// src/components/lists/FigmaListCard.tsx
 import Link from 'next/link';
 import React from 'react';
 
-export type Row = { id: string; grade: 'A'|'B'|'C'; date: string };
+export type Row = { id: string; grade: 'A'|'B'|'defect'; date: string };
 
 function gradeColor(g: Row['grade']) {
   if (g === 'A') return 'text-gradea';
@@ -10,7 +9,16 @@ function gradeColor(g: Row['grade']) {
   return 'text-defect';
 }
 
-export default function FigmaListCard({ rows }: { rows: Row[] }) {
+type Props = {
+  rows: Row[];
+  page?: number;          
+  pageSize?: number;      
+};
+
+export default function FigmaListCard({ rows, page = 1, pageSize = 20 }: Props) {
+  const start = (page - 1) * pageSize;
+  const pageRows = rows.slice(start, start + pageSize);
+
   return (
     <div className="rounded-xl border border-brand-border bg-box text-heading font-dm-sans overflow-hidden">
       <div className="px-5 h-14 flex items-center text-lg">All Products</div>
@@ -25,21 +33,15 @@ export default function FigmaListCard({ rows }: { rows: Row[] }) {
       </div>
 
       <div className="divide-y divide-list-sep">
-        {rows.map((r, i) => (
+        {pageRows.map((r, i) => (
           <div
-            key={`${r.id}-${i}`}
-            className={`px-5 h-[56.8px] grid items-center hover:bg-white/5 ${i % 2 === 0 ? 'bg-box' : 'bg-[#0a1330]'}`}
+            key={`${r.id}-${start + i}`}
+            className={`px-5 h-[56.8px] grid items-center hover:bg-white/5 ${(start + i) % 2 === 0 ? 'bg-box' : 'bg-[#0a1330]'}`}
           >
             <div className="grid grid-cols-[minmax(0,1fr)_500px_200px] items-center">
-              {/* 🔗 상세로 이동 */}
-              <Link
-                href={`/list/${encodeURIComponent(r.id)}`}
-                className="truncate hover:underline"
-                title={r.id}
-              >
+              <Link href={`/list/${encodeURIComponent(r.id)}`} className="truncate hover:underline" title={r.id}>
                 {r.id}
               </Link>
-
               <span className={`text-left pl-2 font-semibold ${gradeColor(r.grade)}`}>{r.grade}</span>
               <span className="text-left pl-2 text-sub tabular-nums">{r.date}</span>
             </div>

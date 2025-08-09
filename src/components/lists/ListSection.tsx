@@ -19,9 +19,12 @@ export default function ListSection() {
   const [loading, setLoading] = React.useState(true);
   const [err, setErr] = React.useState<string | null>(null);
 
-
   const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('asc');
-  const [pickedDate, setPickedDate] = React.useState<string | null>(null); // 'YYYY-MM-DD'
+  const [pickedDate, setPickedDate] = React.useState<string | null>(null);
+
+  // ✅ 페이지네이션 상태
+  const [page, setPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(20); // 한 페이지 20개
 
   React.useEffect(() => {
     (async () => {
@@ -38,10 +41,10 @@ export default function ListSection() {
     })();
   }, []);
 
+  // 검색/날짜/정렬 계산
   const filtered = React.useMemo(() => {
     let result = [...rows];
 
-    // 검색
     const q = query.trim().toLowerCase();
     if (q) {
       result = result.filter(
@@ -52,13 +55,11 @@ export default function ListSection() {
       );
     }
 
-    // 날짜 필터: 동일 날짜만 보기
     if (pickedDate) {
-      const targetYmd = pickedDate.replace(/-/g, '.'); // 'YYYY-MM-DD' → 'YYYY.MM.DD'
+      const targetYmd = pickedDate.replace(/-/g, '.');
       result = result.filter((r) => r.date === targetYmd);
     }
 
-    // 날짜 정렬
     result.sort((a, b) => {
       const da = ymdToMs(a.date);
       const db = ymdToMs(b.date);
@@ -68,21 +69,35 @@ export default function ListSection() {
     return result;
   }, [rows, query, pickedDate, sortOrder]);
 
+  // ✅ 검색/날짜 변경 시 페이지 리셋
+  React.useEffect(() => {
+    setPage(1);
+  }, [query, pickedDate, sortOrder]);
+
+  // ✅ 현재 페이지의 데이터 잘라내기
+  const total = filtered.length;
+  const start = (page - 1) * pageSize;
+  const pageRows = filtered.slice(start, start + pageSize);
+
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-3">
         <Toolbar
           sortOrder={sortOrder}
           onToggleSort={() => setSortOrder((p) => (p === 'asc' ? 'desc' : 'asc'))}
-          onPickDate={(d) => setPickedDate(d)}       // 'YYYY-MM-DD' 또는 null
+          onPickDate={(d) => setPickedDate(d)}
           currentDate={pickedDate}
         />
         <div className="flex-1">
-          <SearchBar value={query} onChange={setQuery} placeholder="Search for..." />
+          <SearchBar
+            value={query}
+            onChange={setQuery}
+            onSearch={() => setPage(1)}
+            placeholder="Search for..."
+          />
         </div>
       </div>
 
-      {/* 현재 선택된 날짜 표시/초기화 */}
       {pickedDate && (
         <div className="text-m text-sub">
           날짜: <b className="text-heading">{pickedDate}</b>
@@ -104,8 +119,17 @@ export default function ListSection() {
       )}
       {!loading && !err && (
         <>
-          <ListTable rows={filtered} />
-          <FooterPagination total={filtered.length} page={1} pageSize={40} />
+          {/* ✅ 현재 페이지 데이터만 렌더 */}
+          <ListTable rows={pageRows} />
+
+          {/* ✅ 페이지네이션 컨트롤 */}
+          <FooterPagination
+            total={total}
+            page={page}
+            pageSize={pageSize}
+            onChange={setPage}                // ← FooterPagination에 이 prop이 있어야 함
+            onPageSizeChange={setPageSize}    // (선택) 페이지 크기 드롭다운이 있다면
+          />
         </>
       )}
     </section>
