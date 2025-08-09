@@ -1,8 +1,8 @@
 import React from 'react';
 
 type Props = {
-  value?: Date;                       
-  onSelect: (isoDate: string) => void; 
+  value?: Date;
+  onSelect: (isoDate: string) => void;
   onClose?: () => void;
 };
 
@@ -13,17 +13,19 @@ function fmtYYYYMMDD(d: Date) {
   return `${y}-${m}-${day}`;
 }
 const startOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth(), 1);
-const endOfMonth   = (d: Date) => new Date(d.getFullYear(), d.getMonth() + 1, 0);
-const addMonths    = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth() + n, 1);
+const endOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth() + 1, 0);
+const addMonths = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth() + n, 1);
 
-const WEEK = ['S','M','T','W','T','F','S'];
+const WEEK = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 export default function CalendarPopover({ value, onSelect, onClose }: Props) {
-  const [view, setView] = React.useState<Date>(value ? startOfMonth(value) : startOfMonth(new Date()));
+  const [view, setView] = React.useState<Date>(
+    value ? startOfMonth(value) : startOfMonth(new Date())
+  );
   const selected = value ? fmtYYYYMMDD(value) : '';
 
   const start = startOfMonth(view);
-  const end   = endOfMonth(view);
+  const end = endOfMonth(view);
 
   // 달력 셀 구성
   const days: (Date | null)[] = [];
@@ -34,30 +36,36 @@ export default function CalendarPopover({ value, onSelect, onClose }: Props) {
   }
   while (days.length % 7) days.push(null);
 
-  const title    = view.toLocaleDateString(undefined, { year: 'numeric', month: 'long' });
+  const title = view.toLocaleDateString(undefined, { year: 'numeric', month: 'long' });
   const todayYmd = fmtYYYYMMDD(new Date()); // ← 이 이름과 일치하게 사용
 
   return (
-    <div className="w-[260px] rounded-xl border border-brand-border bg-box text-heading shadow-side p-3">
+    <div className="w-[260px] rounded-xl border border-brand-border bg-box p-3 text-heading shadow-side">
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="mb-2 flex items-center justify-between">
         <div className="text-xs opacity-80">{title}</div>
         <div className="flex items-center gap-1">
           <button
-            className="h-6 w-6 grid place-items-center rounded bg-white/5 hover:bg-white/10"
-            onClick={() => setView((v) => addMonths(v, -1))}
-          >‹</button>
+            className="grid h-6 w-6 place-items-center rounded bg-white/5 hover:bg-white/10"
+            onClick={() => setView(v => addMonths(v, -1))}
+          >
+            ‹
+          </button>
           <button
-            className="h-6 w-6 grid place-items-center rounded bg-white/5 hover:bg-white/10"
-            onClick={() => setView((v) => addMonths(v, 1))}
-          >›</button>
+            className="grid h-6 w-6 place-items-center rounded bg-white/5 hover:bg-white/10"
+            onClick={() => setView(v => addMonths(v, 1))}
+          >
+            ›
+          </button>
         </div>
       </div>
 
       {/* 요일 헤더 (key 중복 방지) */}
-      <div className="grid grid-cols-7 text-[11px] text-sub/80 mb-1">
+      <div className="mb-1 grid grid-cols-7 text-[11px] text-sub/80">
         {WEEK.map((w, idx) => (
-          <div key={`${w}-${idx}`} className="h-6 grid place-items-center">{w}</div>
+          <div key={`${w}-${idx}`} className="grid h-6 place-items-center">
+            {w}
+          </div>
         ))}
       </div>
 
@@ -66,18 +74,21 @@ export default function CalendarPopover({ value, onSelect, onClose }: Props) {
         {days.map((d, i) => {
           if (!d) return <div key={`pad-${i}`} className="h-8" />; // 패딩칸
 
-          const ymd       = fmtYYYYMMDD(d);
+          const ymd = fmtYYYYMMDD(d);
           const isSelected = selected === ymd;
-          const isToday    = ymd === todayYmd; // ← 여기!
+          const isToday = ymd === todayYmd; // ← 여기!
 
           return (
             <button
               key={`${ymd}-${i}`}
-              onClick={() => { onSelect(ymd); onClose?.(); }}
+              onClick={() => {
+                onSelect(ymd);
+                onClose?.();
+              }}
               className={[
-                "h-8 w-8 mx-auto grid place-items-center rounded-full transition",
-                isSelected ? "bg-button text-white" : "hover:bg-white/10",
-                isToday && !isSelected ? "ring-1 ring-brand-border" : "",
+                'mx-auto grid h-8 w-8 place-items-center rounded-full transition',
+                isSelected ? 'bg-button text-white' : 'hover:bg-white/10',
+                isToday && !isSelected ? 'ring-1 ring-brand-border' : '',
               ].join(' ')}
             >
               {d.getDate()}
@@ -87,11 +98,23 @@ export default function CalendarPopover({ value, onSelect, onClose }: Props) {
       </div>
 
       {/* 푸터 */}
-      <div className="flex items-center justify-between mt-2 text-xs text-sub">
-        <button className="hover:underline" onClick={() => { onSelect(''); onClose?.(); }}>
+      <div className="mt-2 flex items-center justify-between text-xs text-sub">
+        <button
+          className="hover:underline"
+          onClick={() => {
+            onSelect('');
+            onClose?.();
+          }}
+        >
           Clear
         </button>
-        <button className="hover:underline" onClick={() => { onSelect(todayYmd); onClose?.(); }}>
+        <button
+          className="hover:underline"
+          onClick={() => {
+            onSelect(todayYmd);
+            onClose?.();
+          }}
+        >
           Today
         </button>
       </div>

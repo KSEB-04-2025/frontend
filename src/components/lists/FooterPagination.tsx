@@ -4,7 +4,7 @@ import React from 'react';
 
 type Props = {
   total: number;
-  page: number;        // 1부터 시작
+  page: number; // 1부터 시작
   pageSize: number;
   onChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
@@ -28,7 +28,7 @@ export default function FooterPagination({
 
   return (
     <div className="flex items-center justify-between text-sm text-slate-400">
-      <div className="rounded-lg border border-darkslategray/60 bg-[#0f1421] px-4 py-2">
+      <div className="border-darkslategray/60 rounded-lg border bg-[#0f1421] px-4 py-2">
         {start} - {end} of {total}
       </div>
 
@@ -36,16 +36,16 @@ export default function FooterPagination({
         <span className="text-xs">Rows per page:</span>
 
         <select
-          className="bg-[#0f1421] border border-darkslategray/60 rounded px-2 py-1 text-xs outline-none"
+          className="border-darkslategray/60 rounded border bg-[#0f1421] px-2 py-1 text-xs outline-none"
           value={pageSize}
-          onChange={(e) => {
+          onChange={e => {
             const size = Number(e.target.value);
             onPageSizeChange?.(size);
             // 보통 페이지 크기 바꾸면 1페이지로
             onChange?.(1);
           }}
         >
-          {[20, 40, 80].map((n) => (
+          {[20, 40, 80].map(n => (
             <option key={n} value={n}>
               {n}
             </option>
@@ -89,8 +89,7 @@ function NavBtn({
       title={title}
       disabled={disabled}
       onClick={onClick}
-      className={`grid place-items-center size-8 rounded border border-darkslategray/60
-        ${disabled ? 'opacity-40 cursor-not-allowed' : 'bg-[#0f1421] hover:bg-[#121a2b]'}`}
+      className={`border-darkslategray/60 grid size-8 place-items-center rounded border ${disabled ? 'cursor-not-allowed opacity-40' : 'bg-[#0f1421] hover:bg-[#121a2b]'}`}
     >
       {children}
     </button>

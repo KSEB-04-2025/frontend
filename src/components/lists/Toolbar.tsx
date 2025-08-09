@@ -35,7 +35,7 @@ const Toolbar: NextPage<Props> = ({ sortOrder, onToggleSort, onPickDate, current
       </IconBtn>
 
       <div className="relative" ref={wrapperRef}>
-        <IconBtn title="날짜" onClick={() => setOpen((v) => !v)}>
+        <IconBtn title="날짜" onClick={() => setOpen(v => !v)}>
           <AiOutlineCalendar size={20} />
         </IconBtn>
 
@@ -43,7 +43,7 @@ const Toolbar: NextPage<Props> = ({ sortOrder, onToggleSort, onPickDate, current
           <div className="absolute left-0 top-[calc(100%+8px)] z-50">
             <CalendarPopover
               value={selected}
-              onSelect={(ymd) => onPickDate(ymd || null)}
+              onSelect={ymd => onPickDate(ymd || null)}
               onClose={() => setOpen(false)}
             />
           </div>

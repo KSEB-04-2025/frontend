@@ -9,7 +9,7 @@ export default function IconBtn({
     <button
       title={title}
       onClick={onClick}
-      className="grid place-items-center h-[50px] w-[50px] rounded-lg border border-brand-border bg-box hover:bg-[#121a2b] transition"
+      className="grid h-[50px] w-[50px] place-items-center rounded-lg border border-brand-border bg-box transition hover:bg-[#121a2b]"
     >
       {children}
     </button>

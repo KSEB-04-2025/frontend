@@ -19,7 +19,7 @@ const SearchBar: NextPage<Props> = ({
   return (
     <div className="flex w-full gap-2">
       {/* 검색 입력창 */}
-      <div className="relative flex-1 h-[50px] rounded border border-brand-border bg-box">
+      <div className="relative h-[50px] flex-1 rounded border border-brand-border bg-box">
         {/* 검색 아이콘 */}
         <span className="absolute left-3 top-1/2 -translate-y-1/2 opacity-80">
           <AiOutlineSearch size={18} />
@@ -29,18 +29,18 @@ const SearchBar: NextPage<Props> = ({
           type="text"
           value={value}
           placeholder={placeholder}
-          onChange={(e) => onChange?.(e.target.value)}
-          onKeyDown={(e) => {
+          onChange={e => onChange?.(e.target.value)}
+          onKeyDown={e => {
             if (e.key === 'Enter') onSearch?.();
           }}
-          className="absolute inset-0 w-full h-full bg-transparent pl-10 pr-3 text-sm text-heading placeholder:text-sub/80 outline-none"
+          className="absolute inset-0 h-full w-full bg-transparent pl-10 pr-3 text-sm text-heading outline-none placeholder:text-sub/80"
         />
       </div>
 
       {/* 검색 버튼 */}
       <button
         onClick={onSearch}
-        className="w-[80px] h-[50px] rounded-lg bg-button hover:opacity-90 text-lg font-dm-sans text-white"
+        className="h-[50px] w-[80px] rounded-lg bg-button font-dm-sans text-lg text-white hover:opacity-90"
       >
         검색
       </button>

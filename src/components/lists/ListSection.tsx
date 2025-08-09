@@ -7,6 +7,10 @@ import ListTable from '@/components/lists/ListTable';
 import FooterPagination from '@/components/lists/FooterPagination';
 import { fetchAllProducts, type ProductRow } from '@/apis/lists';
 
+interface ApiError {
+  message?: string;
+}
+
 function ymdToMs(ymd: string) {
   const iso = ymd.replace(/\./g, '-');
   const t = new Date(iso).getTime();
@@ -33,8 +37,9 @@ export default function ListSection() {
         setErr(null);
         const data = await fetchAllProducts();
         setRows(data);
-      } catch (e: any) {
-        setErr(e?.message || '목록을 불러오지 못했습니다.');
+      } catch (e) {
+        const error = e as ApiError;
+        setErr(error?.message || '목록을 불러오지 못했습니다.');
       } finally {
         setLoading(false);
       }
@@ -48,7 +53,7 @@ export default function ListSection() {
     const q = query.trim().toLowerCase();
     if (q) {
       result = result.filter(
-        (r) =>
+        r =>
           r.id.toLowerCase().includes(q) ||
           r.grade.toLowerCase().includes(q) ||
           r.date.toLowerCase().includes(q)
@@ -57,7 +62,7 @@ export default function ListSection() {
 
     if (pickedDate) {
       const targetYmd = pickedDate.replace(/-/g, '.');
-      result = result.filter((r) => r.date === targetYmd);
+      result = result.filter(r => r.date === targetYmd);
     }
 
     result.sort((a, b) => {
@@ -84,8 +89,8 @@ export default function ListSection() {
       <div className="flex items-center gap-3">
         <Toolbar
           sortOrder={sortOrder}
-          onToggleSort={() => setSortOrder((p) => (p === 'asc' ? 'desc' : 'asc'))}
-          onPickDate={(d) => setPickedDate(d)}
+          onToggleSort={() => setSortOrder(p => (p === 'asc' ? 'desc' : 'asc'))}
+          onPickDate={d => setPickedDate(d)}
           currentDate={pickedDate}
         />
         <div className="flex-1">
@@ -127,8 +132,8 @@ export default function ListSection() {
             total={total}
             page={page}
             pageSize={pageSize}
-            onChange={setPage}                // ← FooterPagination에 이 prop이 있어야 함
-            onPageSizeChange={setPageSize}    // (선택) 페이지 크기 드롭다운이 있다면
+            onChange={setPage} // ← FooterPagination에 이 prop이 있어야 함
+            onPageSizeChange={setPageSize} // (선택) 페이지 크기 드롭다운이 있다면
           />
         </>
       )}

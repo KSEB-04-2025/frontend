@@ -3,11 +3,10 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 type RetriableConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
 export const axioscommon = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL, 
-  withCredentials: true,                          
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  withCredentials: true,
   headers: { Accept: 'application/json' },
 });
-
 
 const authClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -18,23 +17,20 @@ const authClient = axios.create({
 let isRefreshing = false;
 let queue: Array<() => void> = [];
 
-
 async function devLogin() {
   const username = process.env.NEXT_PUBLIC_DEV_ID || '';
   const password = process.env.NEXT_PUBLIC_DEV_PW || '';
   if (!username || !password) throw new Error('DEV ID/PW가 .env.local에 없습니다.');
-  await authClient.post('/login', { username, password }); 
+  await authClient.post('/login', { username, password });
 }
-
 
 function shouldSkip(url?: string) {
   if (!url) return false;
   return url.endsWith('/login') || url.endsWith('/logout');
 }
 
-
 axioscommon.interceptors.response.use(
-  (res) => res,
+  res => res,
   async (err: AxiosError) => {
     const resp = err.response;
     const cfg = (err.config || {}) as RetriableConfig;
@@ -48,11 +44,11 @@ axioscommon.interceptors.response.use(
       if (!isRefreshing) {
         isRefreshing = true;
         try {
-          await devLogin();           
+          await devLogin();
           isRefreshing = false;
-          queue.forEach((cb) => cb());
+          queue.forEach(cb => cb());
           queue = [];
-          return axioscommon(cfg);             
+          return axioscommon(cfg);
         } catch (e) {
           isRefreshing = false;
           queue = [];
@@ -60,7 +56,6 @@ axioscommon.interceptors.response.use(
         }
       }
 
-      
       return new Promise((resolve, reject) => {
         queue.push(() => {
           axioscommon(cfg).then(resolve).catch(reject);

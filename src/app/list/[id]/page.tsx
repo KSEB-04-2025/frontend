@@ -8,14 +8,30 @@ import { axioscommon } from '@/apis/common';
 type Detail = {
   productId: string;
   imageUrl?: string;
-  label: 'A' | 'B' | 'defect';    
-  qualityGrade?: string;      
-  uploadDate?: string;        
+  label: 'A' | 'B' | 'defect';
+  qualityGrade?: string;
+  uploadDate?: string;
   uniformity?: number;
   maxCluster?: number;
   nclusters?: number;
   nspots?: number;
 };
+
+interface RawDetailData {
+  productId?: string;
+  imageUrl?: string;
+  label?: string;
+  qualityGrade?: string;
+  uploadDate?: string;
+  uniformity?: number;
+  maxCluster?: number;
+  nclusters?: number;
+  nspots?: number;
+}
+
+interface ApiError {
+  message?: string;
+}
 
 function toGrade(v: unknown): 'A' | 'B' | 'defect' {
   const s = String(v ?? '').toUpperCase();
@@ -50,7 +66,9 @@ export default function ProductDetailPage() {
         setErr(null);
 
         // baseURL에 이미 /api 포함되어 있다고 했으므로 /admin부터 시작
-        const res = await axioscommon.get(`/admin/product-quality/${encodeURIComponent(id)}`);
+        const res = await axioscommon.get<RawDetailData>(
+          `/admin/product-quality/${encodeURIComponent(id)}`
+        );
         const raw = res.data ?? {};
 
         setData({
@@ -64,8 +82,9 @@ export default function ProductDetailPage() {
           nclusters: raw.nclusters,
           nspots: raw.nspots,
         });
-      } catch (e: any) {
-        setErr(e?.message || '상세를 불러오지 못했습니다.');
+      } catch (e) {
+        const error = e as ApiError;
+        setErr(error?.message || '상세를 불러오지 못했습니다.');
       } finally {
         setLoading(false);
       }
@@ -75,7 +94,9 @@ export default function ProductDetailPage() {
   if (loading) {
     return (
       <div className="container mx-auto px-6 py-8">
-        <div className="rounded-xl border border-brand-border bg-box/60 p-6 text-sub">Loading...</div>
+        <div className="rounded-xl border border-brand-border bg-box/60 p-6 text-sub">
+          Loading...
+        </div>
       </div>
     );
   }
@@ -83,7 +104,9 @@ export default function ProductDetailPage() {
   if (err || !data) {
     return (
       <div className="container mx-auto px-6 py-8">
-        <div className="rounded-xl border border-brand-border bg-box/60 p-6 text-defect">{err || '데이터 없음'}</div>
+        <div className="rounded-xl border border-brand-border bg-box/60 p-6 text-defect">
+          {err || '데이터 없음'}
+        </div>
       </div>
     );
   }
@@ -96,7 +119,7 @@ export default function ProductDetailPage() {
           <b className="text-2xl tracking-tight">[Grade] {data.label}</b>
           <button
             onClick={() => router.back()}
-            className="h-[46px] px-4 rounded-lg bg-button text-sm font-dm-sans text-white hover:opacity-90"
+            className="h-[46px] rounded-lg bg-button px-4 font-dm-sans text-sm text-white hover:opacity-90"
           >
             뒤로가기
           </button>
@@ -105,24 +128,23 @@ export default function ProductDetailPage() {
         {/* 본문 */}
         <div className="mt-8 flex gap-8">
           {/* 좌측 이미지 */}
-          <div className="rounded-lg overflow-hidden w-[486px] h-[476px] bg-black/20">
+          <div className="h-[476px] w-[486px] overflow-hidden rounded-lg bg-black/20">
             {data.imageUrl ? (
-            <img
+              <Image
                 src={data.imageUrl}
                 alt="product"
                 width={486}
                 height={476}
                 className="h-full w-full object-cover"
-                referrerPolicy="no-referrer"
                 onError={() => console.log('이미지 실패: 만료/권한 가능성')}
-                />
+              />
             ) : (
-              <div className="h-full w-full grid place-items-center text-sub">No Image</div>
+              <div className="grid h-full w-full place-items-center text-sub">No Image</div>
             )}
           </div>
 
           {/* 우측 메트릭 */}
-          <div className="w-[248px] text-base font-inter text-sub space-y-3">
+          <div className="w-[248px] space-y-3 font-inter text-base text-sub">
             <Section label="[ID]" value={data.productId} strong />
             <Section label="품질 등급(문자)" value={data.label} />
             <Section label="품질 등급(설명)" value={data.qualityGrade || '-'} />
@@ -141,11 +163,21 @@ export default function ProductDetailPage() {
   );
 }
 
-function Section({ label, value, strong }: { label: string; value?: React.ReactNode; strong?: boolean }) {
+function Section({
+  label,
+  value,
+  strong,
+}: {
+  label: string;
+  value?: React.ReactNode;
+  strong?: boolean;
+}) {
   return (
     <div className="rounded-xl p-2">
-      <div className="leading-5 truncate">{label}</div>
-      <div className={`text-[15px] leading-[18px] font-pretendard ${strong ? 'text-white font-semibold' : 'text-white'}`}>
+      <div className="truncate leading-5">{label}</div>
+      <div
+        className={`font-pretendard text-[15px] leading-[18px] ${strong ? 'font-semibold text-white' : 'text-white'}`}
+      >
         {value ?? '-'}
       </div>
     </div>
