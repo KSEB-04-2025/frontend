@@ -1,21 +1,24 @@
 // src/app/layout.tsx
+import type { Metadata } from 'next';
 import './globals.css';
 import Sidebar from '@/components/sections/Sidebar';
 import HeaderBar from '@/components/sections/HeaderBar';
 
-export const metadata = {
-  title: 'ZEZE ONE',
-  description: 'Manufacturing Dashboard',
+export const metadata: Metadata = {
+  title: 'ZEZE ONE Dashboard',
+  description: 'Smart Factory Dashboard',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body className="flex h-screen bg-[#0B0E1C] text-white">
-        <Sidebar />
-        <div className="flex flex-1 flex-col overflow-auto">
-          <HeaderBar />
-          <main className="p-6">{children}</main>
+      <body className="min-h-screen bg-[#0A0D1A] text-white antialiased">
+        <div className="grid grid-cols-[auto_1fr]">
+          <Sidebar />
+          <div className="min-h-screen overflow-y-auto">
+            <HeaderBar />
+            <main className="px-6 py-8">{children}</main>
+          </div>
         </div>
       </body>
     </html>
