@@ -40,7 +40,7 @@ const SearchBar: NextPage<Props> = ({
       {/* 검색 버튼 */}
       <button
         onClick={onSearch}
-        className="w-[80px] h-[50px] rounded-lg bg-button hover:opacity-90 text-sm font-dm-sans text-white"
+        className="w-[80px] h-[50px] rounded-lg bg-button hover:opacity-90 text-lg font-dm-sans text-white"
       >
         검색
       </button>
