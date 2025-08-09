@@ -1,4 +1,5 @@
-import type { NextPage } from 'next';
+'use client';
+
 import React from 'react';
 import { MdFilterList } from 'react-icons/md';
 import { AiOutlineCalendar } from 'react-icons/ai';
@@ -12,11 +13,10 @@ type Props = {
   currentDate?: string | null;
 };
 
-const Toolbar: NextPage<Props> = ({ sortOrder, onToggleSort, onPickDate, currentDate }) => {
+const Toolbar: React.FC<Props> = ({ sortOrder, onToggleSort, onPickDate, currentDate }) => {
   const [open, setOpen] = React.useState(false);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
 
-  // 바깥 클릭 시 닫기
   React.useEffect(() => {
     const onDown = (e: MouseEvent) => {
       if (!wrapperRef.current) return;

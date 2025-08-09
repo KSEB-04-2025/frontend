@@ -15,7 +15,8 @@ const authClient = axios.create({
 });
 
 let isRefreshing = false;
-let queue: Array<() => void> = [];
+type RetryCallback = (err?: unknown) => void;
+let queue: RetryCallback[] = [];
 
 async function devLogin() {
   const username = process.env.NEXT_PUBLIC_DEV_ID || '';
@@ -51,13 +52,16 @@ axioscommon.interceptors.response.use(
           return axioscommon(cfg);
         } catch (e) {
           isRefreshing = false;
+          const error = e;
+          queue.forEach(cb => cb(error));
           queue = [];
           throw e;
         }
       }
 
       return new Promise((resolve, reject) => {
-        queue.push(() => {
+        queue.push(err => {
+          if (err) return reject(err);
           axioscommon(cfg).then(resolve).catch(reject);
         });
       });

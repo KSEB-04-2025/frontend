@@ -40,7 +40,7 @@ function toGrade(v: unknown): 'A' | 'B' | 'defect' {
 
 const toYmd = (iso?: string) => {
   if (!iso) return '-';
-  const d = new Date(iso);
+  const d = new Date(new Date(iso).getTime() + 9 * 60 * 60 * 1000);
   if (Number.isNaN(d.getTime())) return '-';
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -65,7 +65,6 @@ export default function ProductDetailPage() {
         setLoading(true);
         setErr(null);
 
-        // baseURL에 이미 /api 포함되어 있다고 했으므로 /admin부터 시작
         const res = await axioscommon.get<RawDetailData>(
           `/admin/product-quality/${encodeURIComponent(id)}`
         );
@@ -114,20 +113,17 @@ export default function ProductDetailPage() {
   return (
     <div className="container mx-auto px-6 py-8">
       <div className="rounded-lg border border-brand-border bg-box p-6">
-        {/* 헤더 */}
         <div className="flex items-center justify-between">
           <b className="text-2xl tracking-tight">[Grade] {data.label}</b>
           <button
             onClick={() => router.back()}
-            className="h-[46px] rounded-lg bg-button px-4 font-dm-sans text-sm text-white hover:opacity-90"
+            className="text-m h-[48px] rounded-lg bg-button px-10 font-dm-sans text-white hover:opacity-90"
           >
             뒤로가기
           </button>
         </div>
 
-        {/* 본문 */}
-        <div className="mt-8 flex gap-8">
-          {/* 좌측 이미지 */}
+        <div className="mx-auto mt-5 flex max-w-[1100px] flex-col items-center justify-start gap-14 lg:flex-row lg:items-start lg:justify-start lg:gap-28">
           <div className="h-[476px] w-[486px] overflow-hidden rounded-lg bg-black/20">
             {data.imageUrl ? (
               <Image
@@ -144,7 +140,7 @@ export default function ProductDetailPage() {
           </div>
 
           {/* 우측 메트릭 */}
-          <div className="w-[248px] space-y-3 font-inter text-base text-sub">
+          <div className="w-[280px] space-y-2 font-inter text-base text-sub">
             <Section label="[ID]" value={data.productId} strong />
             <Section label="품질 등급(문자)" value={data.label} />
             <Section label="품질 등급(설명)" value={data.qualityGrade || '-'} />
@@ -173,7 +169,7 @@ function Section({
   strong?: boolean;
 }) {
   return (
-    <div className="rounded-xl p-2">
+    <div className="rounded-xl p-3">
       <div className="truncate leading-5">{label}</div>
       <div
         className={`font-pretendard text-[15px] leading-[18px] ${strong ? 'font-semibold text-white' : 'text-white'}`}

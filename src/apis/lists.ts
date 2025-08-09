@@ -1,4 +1,3 @@
-// src/apis/lists.ts
 import { axioscommon } from '@/apis/common';
 
 export type ProductRow = { id: string; grade: 'A' | 'B' | 'defect'; date: string };
@@ -17,7 +16,8 @@ const toYmd = (v: unknown): string => {
   if (!v) return '';
   const d = new Date(v as string);
   if (isNaN(d.getTime())) return '';
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+  return `${kst.getUTCFullYear()}.${String(kst.getUTCMonth() + 1).padStart(2, '0')}.${String(kst.getUTCDate()).padStart(2, '0')}`;
 };
 
 // 목록
@@ -71,7 +71,7 @@ export async function fetchProductQuality(id: string): Promise<ProductDetail> {
   return {
     productId: data.productId ?? id,
     label,
-    uploadDate: data.uploadDate ?? '',
+    uploadDate: toYmd(data.uploadDate),
     imageUrl: data.imageUrl,
     qualityGrade: data.qualityGrade,
     uniformity: data.uniformity,

@@ -27,7 +27,6 @@ export default function CalendarPopover({ value, onSelect, onClose }: Props) {
   const start = startOfMonth(view);
   const end = endOfMonth(view);
 
-  // 달력 셀 구성
   const days: (Date | null)[] = [];
   const pad = start.getDay(); // 0~6
   for (let i = 0; i < pad; i++) days.push(null);
@@ -41,7 +40,6 @@ export default function CalendarPopover({ value, onSelect, onClose }: Props) {
 
   return (
     <div className="w-[260px] rounded-xl border border-brand-border bg-box p-3 text-heading shadow-side">
-      {/* 헤더 */}
       <div className="mb-2 flex items-center justify-between">
         <div className="text-xs opacity-80">{title}</div>
         <div className="flex items-center gap-1">
@@ -60,7 +58,6 @@ export default function CalendarPopover({ value, onSelect, onClose }: Props) {
         </div>
       </div>
 
-      {/* 요일 헤더 (key 중복 방지) */}
       <div className="mb-1 grid grid-cols-7 text-[11px] text-sub/80">
         {WEEK.map((w, idx) => (
           <div key={`${w}-${idx}`} className="grid h-6 place-items-center">
@@ -69,7 +66,6 @@ export default function CalendarPopover({ value, onSelect, onClose }: Props) {
         ))}
       </div>
 
-      {/* 날짜 그리드 */}
       <div className="grid grid-cols-7 gap-y-1 text-sm">
         {days.map((d, i) => {
           if (!d) return <div key={`pad-${i}`} className="h-8" />; // 패딩칸

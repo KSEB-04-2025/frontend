@@ -28,7 +28,7 @@ export default function FooterPagination({
 
   return (
     <div className="flex items-center justify-between text-sm text-slate-400">
-      <div className="border-darkslategray/60 rounded-lg border bg-[#0f1421] px-4 py-2">
+      <div className="border-darkslategray/60 rounded-lg bg-[#0f1421] px-4 py-2">
         {start} - {end} of {total}
       </div>
 
@@ -36,7 +36,7 @@ export default function FooterPagination({
         <span className="text-xs">Rows per page:</span>
 
         <select
-          className="border-darkslategray/60 rounded border bg-[#0f1421] px-2 py-1 text-xs outline-none"
+          className="border-darkslategray/60 rounded bg-[#0f1421] px-2 py-1 text-xs outline-none"
           value={pageSize}
           onChange={e => {
             const size = Number(e.target.value);
