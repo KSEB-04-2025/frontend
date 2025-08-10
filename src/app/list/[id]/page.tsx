@@ -126,17 +126,18 @@ export default function ProductDetailPage() {
         <div className="mx-auto mt-5 flex max-w-[1100px] flex-col items-center justify-start gap-14 lg:flex-row lg:items-start lg:justify-start lg:gap-28">
           <div className="h-[476px] w-[486px] overflow-hidden rounded-lg bg-black/20">
             {data.imageUrl ? (
-              <Image
-                src={data.imageUrl}
-                alt="product"
-                width={486}
-                height={476}
-                className="h-full w-full object-cover"
-                onError={() => console.log('이미지 실패: 만료/권한 가능성')}
-              />
-            ) : (
-              <div className="grid h-full w-full place-items-center text-sub">No Image</div>
-            )}
+  <Image
+    src={data.imageUrl}        // ✅ undefined 변수 대신 API에서 받은 서명 URL 그대로
+    alt="product"
+    width={486}
+    height={476}
+    className="h-full w-full object-cover"
+    unoptimized                // ✅ 먼저 원본으로 직접 띄워보고, 뜨면 나중에 제거
+    onError={() => console.log('이미지 실패: 만료/권한/경로 확인')}
+  />
+) : (
+  <div className="grid h-full w-full place-items-center text-sub">No Image</div>
+)}
           </div>
 
           {/* 우측 메트릭 */}
