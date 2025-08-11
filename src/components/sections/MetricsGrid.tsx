@@ -75,7 +75,8 @@ export default function MetricsGrid() {
           setTodayB(null);
           setTodayDef(null);
         }
-      } catch {
+      } catch (error) {
+        console.error('Failed to fetch metrics data:', error);
         if (!alive) return;
         setAbRows([]);
         setDefRows([]);

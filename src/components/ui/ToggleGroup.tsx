@@ -57,7 +57,7 @@ export default function ToggleGroup() {
       window.removeEventListener('mousedown', onClick);
       window.removeEventListener('keydown', onKey);
     };
-  }, [open]);
+  }, [open, period, setPeriod]);
 
   const handleSelect = (p: 'today' | 'week' | 'month') => {
     setPeriod(p);
