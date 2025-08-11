@@ -16,7 +16,7 @@ module.exports = {
         inter: ['Inter', 'sans-serif'],
       },
       boxShadow: {
-        side: '0px 8px 28px rgba(1, 5, 17, 0.3)',
+        side: '0px 8px 28px rgba(1, 5, 11, 0.3)',
       },
       colors: {
         'brand-a': '#cb3cff',

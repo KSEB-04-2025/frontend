@@ -1,19 +1,13 @@
-// src/app/page.tsx
-import DashboardLayout from '@/components/layout/DashboardLayout';
-import Sidebar from '@/components/sections/Sidebar';
-import HeaderBar from '@/components/sections/HeaderBar';
-import MetricsGrid from '@/components/sections/MetricsGrid';
 import ChartSection from '@/components/sections/ChartSection';
-import ListSection from '@/components/sections/ListSection';
+import MetricsGrid from '@/components/sections/MetricsGrid';
 
-export default function DashboardPage() {
+export default function Page() {
   return (
-    <DashboardLayout
-      sidebar={<Sidebar />}
-      header={<HeaderBar />}
-      metrics={<MetricsGrid />}
-      chart={<ChartSection />}
-      list={<ListSection />}
-    />
+    <div className="mx-auto h-full min-h-0 max-w-[1400px] px-4 md:px-6">
+      <div className="grid h-full min-h-0 grid-rows-[420px_1fr] gap-5">
+        <ChartSection />
+        <MetricsGrid />
+      </div>
+    </div>
   );
 }

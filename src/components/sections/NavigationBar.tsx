@@ -36,14 +36,12 @@ export default function NavigationBar() {
                 'group relative flex items-center gap-3 rounded-md px-4 py-2.5 transition',
                 active ? 'text-brand-a' : 'text-sub hover:text-heading',
                 'hover:bg-white/5',
-                'text-[20px]', // 프로토타입 톤 (원하면 조절)
+                'text-[20px]',
               ].join(' ')}
             >
-              {/* 아이콘은 currentColor를 따르므로 텍스트 색과 함께 바뀝니다 */}
               <Icon className="size-[18px]" />
               <span className="truncate">{label}</span>
 
-              {/* ▶ 오른쪽 보라 인디케이터 (활성일 때만) */}
               {active && (
                 <span className="pointer-events-none absolute right-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded bg-brand-a" />
               )}

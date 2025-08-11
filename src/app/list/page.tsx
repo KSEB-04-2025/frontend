@@ -1,17 +1,14 @@
 // src/app/list/page.tsx
-import DashboardLayout from '@/components/layout/DashboardLayout';
-import Sidebar from '@/components/sections/Sidebar';
-import HeaderBar from '@/components/sections/HeaderBar';
 import ListSection from '@/components/sections/ListSection';
+
+export const metadata = {
+  title: 'List — ZEZE ONE',
+};
 
 export default function ListPage() {
   return (
-    <DashboardLayout
-      sidebar={<Sidebar />}
-      header={<HeaderBar />}
-      metrics={null}
-      chart={null}
-      list={<ListSection />}
-    />
+    <div className="container mx-auto px-6 py-8">
+      <ListSection />
+    </div>
   );
 }
