@@ -22,8 +22,6 @@ export default function NavigationBar() {
           ONE
         </span>
       </div>
-
-      {/* 메뉴 */}
       <nav className="mt-2 flex flex-col gap-1 px-2">
         {items.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;

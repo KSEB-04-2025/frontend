@@ -4,9 +4,10 @@
 import React from 'react';
 import { getAdminDashboardSummary, getUniformity, type UniformityItem } from '@/apis/dashboard';
 import PieABDefect from '@/components/charts/PieABDefect';
-import BlockUniformityHeatmap from '@/components/charts/BlockUniformityHeatmap';
+import ScatterUniformityAB from '@/components/charts/ScatterUniformityAB';
 
 export default function ChartSection() {
+  // 시각(폭 고정으로 점프 방지)
   const [now, setNow] = React.useState<Date | null>(null);
   React.useEffect(() => {
     setNow(new Date());
@@ -22,9 +23,12 @@ export default function ChartSection() {
       second: '2-digit',
     }) ?? '';
   const dateText = now
-    ? `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} ${day[now.getDay()]}`
+    ? `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(
+        now.getDate()
+      ).padStart(2, '0')} ${day[now.getDay()]}`
     : '';
 
+  // 요약
   const [total, setTotal] = React.useState<number | null>(null);
   const [aCnt, setACnt] = React.useState(0);
   const [bCnt, setBCnt] = React.useState(0);
@@ -56,6 +60,7 @@ export default function ChartSection() {
   const safeTotal = total ?? 0;
   const toPct = (n: number) => (safeTotal > 0 ? `${Math.round((n / safeTotal) * 100)}%` : '-');
 
+  // 균일도/군집도
   const [blocks, setBlocks] = React.useState<UniformityItem[]>([]);
   React.useEffect(() => {
     let alive = true;
@@ -66,58 +71,71 @@ export default function ChartSection() {
       alive = false;
     };
   }, []);
+  const [points, setPoints] = React.useState<UniformityItem[]>([]);
+  React.useEffect(() => {
+    let alive = true;
+    getUniformity()
+      .then(list => alive && setPoints(list))
+      .catch(() => alive && setPoints([]));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const [xCut] = React.useState<number | undefined>(undefined); // 예: 24
+  const [yCut] = React.useState<number | undefined>(undefined); // 예: 0.9
 
   return (
-    <div className="grid min-h-0 grid-cols-1 items-stretch gap-[28px] lg:h-full lg:grid-cols-2 lg:[grid-template-columns:520px_1fr] lg:[grid-template-rows:auto_1fr]">
+    <div className="grid min-h-0 grid-cols-1 items-stretch gap-7 lg:h-full lg:grid-cols-2 lg:[grid-template-columns:520px_1fr] lg:[grid-template-rows:auto_1fr]">
       {/* 시간 + 날짜 */}
-      <div className="col-span-1 flex items-center gap-10">
+      <div className="col-span-1 flex items-center justify-between gap-8">
         <span
-          className="inline-block w-[10ch] text-right text-3xl font-semibold tabular-nums tracking-wide text-heading"
+          className="inline-block w-[8ch] text-right text-5xl font-semibold tabular-nums tracking-wide text-heading"
           suppressHydrationWarning
         >
           {timeText}
         </span>
-        <span className="text-3xl font-extrabold tracking-wide text-sub" suppressHydrationWarning>
+        <span className="text-4xl font-extrabold tracking-wide text-sub" suppressHydrationWarning>
           {dateText}
         </span>
       </div>
 
-      {/* Cluster / Uniformity */}
-      <section className="overflow-hidden rounded-lg border border-brand-border bg-box p-5 lg:row-span-2 lg:h-full">
+      {/* Cluster / Uniformity (Scatter / Bubble) */}
+      <section className="overflow-hidden rounded-xl border border-brand-border bg-box p-5 lg:row-span-2 lg:h-full">
         <div className="mb-4">
-          <h2 className="text-[24px] font-extrabold leading-[1.1] text-heading md:text-[28px]">
+          <h2 className="text-[28px] font-extrabold leading-tight text-heading lg:text-[34px]">
             Cluster / Uniformity
           </h2>
-          <p className="mt-2 text-sm text-sub">균일도와 군집도에 따른 밀도 블록 차트입니다.</p>
+          <p className="mt-2 text-sm text-sub">
+            균일도·군집도 기준의 A/B 분포를 산점도로 표시합니다.
+          </p>
         </div>
-        {/* 기본: 고정 높이, lg 이상: 헤더 제외한 전체 */}
-        <div className="0 grid h-[300px] place-items-center rounded-lg p-4 lg:h-[calc(100%-56px)]">
-          <BlockUniformityHeatmap
-            points={blocks}
-            binsX={10}
-            binsY={8}
-            xDomain={[0.6, 1.0]}
-            yDomain={[0, 120]}
-            aColor="var(--tw-color-brand-a, #cb3cff)"
-            bColor="var(--tw-color-brand-b, #0038ff)"
+
+        <div className="grid h-[300px] place-items-center rounded-lg lg:h-[calc(100%-64px)]">
+          <ScatterUniformityAB
+            points={points}
+            xDomain={[0, 120]} // Number of Clusters
+            yDomain={[0.6, 1.0]} // Uniformity
+            height={undefined as unknown as number} // ResponsiveContainer가 부모 높이를 사용
+            xCut={xCut}
+            yCut={yCut}
           />
         </div>
       </section>
 
       {/* Total Product */}
-      <section className="overflow-hidden rounded-lg border border-brand-border bg-box p-5 lg:h-full">
-        <div className="mb-4 flex items-end gap-2">
-          <h2 className="text-[28px] font-extrabold leading-[1.1] text-heading md:text-[34px]">
+      <section className="overflow-hidden rounded-xl border border-brand-border bg-box p-5 lg:h-full">
+        <div className="mb-4 flex items-center gap-2">
+          <h2 className="text-[28px] font-extrabold leading-tight text-heading lg:text-[34px]">
             Total Product
           </h2>
           <span className="text-sm text-sub">현재까지의 전체 생산량</span>
         </div>
 
-        {/* 기본: 자동 높이, lg 이상: 헤더 제외한 전체 */}
-        <div className="flex flex-col rounded-xl p-4 lg:h-[calc(100%-56px)]">
-          <div className="grid h-full min-h-0 grid-cols-12 gap-5">
-            {/* 파이 */}
-            <div className="col-span-12 h-full lg:col-span-6">
+        <div className="flex flex-col rounded-xl lg:h-[calc(100%-64px)]">
+          <div className="grid h-full min-h-0 grid-cols-12 gap-6">
+            {/* 파이 (정중앙 정렬) */}
+            <div className="col-span-12 lg:col-span-6">
               <div className="flex h-full items-center justify-center">
                 <div className="aspect-square w-[200px] lg:w-[280px]">
                   {safeTotal > 0 ? (

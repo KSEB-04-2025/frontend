@@ -182,7 +182,7 @@ export default function MetricsGrid() {
   const renderWeekMonth = () => (
     <div className="grid h-full min-h-0 grid-cols-12 gap-5">
       {/* Left: Quality (A/B) */}
-      <section className="col-span-12 overflow-hidden rounded-xl border border-brand-border bg-box p-5 lg:col-span-7">
+      <section className="col-span-12 overflow-hidden rounded-lg border border-brand-border bg-box p-5 lg:col-span-7">
         <div className="mb-1 flex items-center gap-3">
           <h3 className="text-4xl font-extrabold text-heading">Quality</h3>
           <div className="flex items-center gap-3 text-xl">
@@ -196,11 +196,11 @@ export default function MetricsGrid() {
         </div>
 
         {loading ? (
-          <div className="placeholder grid h-[320px] place-items-center rounded-xl">
+          <div className="placeholder grid h-[320px] place-items-center rounded-lg">
             불러오는 중…
           </div>
         ) : abRows.length === 0 ? (
-          <div className="placeholder grid h-32 place-items-center rounded-xl">-</div>
+          <div className="placeholder grid h-32 place-items-center rounded-lg">-</div>
         ) : (
           <div
             className="mt-3 grid grid-cols-[repeat(var(--cols),1fr)] gap-8"
@@ -208,11 +208,9 @@ export default function MetricsGrid() {
           >
             {abRows.map((r, idx) => (
               <div key={idx} className="flex flex-col items-center justify-end">
-                {/* ── 막대쌍: A | B 나란히 ── */}
                 <div className="relative flex items-end gap-4" style={{ height: 220 }}>
                   {/* A */}
                   <div className="relative w-10 sm:w-12">
-                    {/* 값 라벨을 막대 위에 고정 */}
                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-2xl font-bold text-heading">
                       {r.a}
                     </div>
@@ -233,8 +231,7 @@ export default function MetricsGrid() {
                   </div>
                 </div>
 
-                {/* 날짜 라벨: 쌍 아래 중앙 정렬 */}
-                <div className="mt-3 whitespace-nowrap text-sm tabular-nums text-sub">
+                <div className="mt-3 whitespace-nowrap text-lg tabular-nums text-sub">
                   {r.label}
                 </div>
               </div>
@@ -244,20 +241,20 @@ export default function MetricsGrid() {
       </section>
 
       {/* Right: defect */}
-      <section className="col-span-12 overflow-hidden rounded-xl border border-brand-border bg-box p-5 lg:col-span-5">
-        <div className="mb-1 flex items-center gap-3">
-          <h3 className="text-[30px] font-extrabold text-heading">defect</h3>
-          <span className="text-sub items-end">
+      <section className="col-span-12 overflow-hidden rounded-lg border border-brand-border bg-box p-5 lg:col-span-5">
+        <div className="mb-4 flex items-center gap-2">
+          <h3 className="text-4xl font-extrabold text-heading">defect</h3>
+          <span className="flex items-end text-sub">
             {period === 'week' ? '주차별 결함 통계' : '월별 결함 통계'}
           </span>
         </div>
 
         {loading ? (
-          <div className="placeholder grid h-[320px] place-items-center rounded-xl">
+          <div className="placeholder grid h-[320px] place-items-center rounded-lg">
             불러오는 중…
           </div>
         ) : defRows.length === 0 ? (
-          <div className="placeholder grid h-32 place-items-center rounded-xl">-</div>
+          <div className="placeholder grid h-32 place-items-center rounded-lg">-</div>
         ) : (
           <div
             className="mt-3 grid grid-cols-[repeat(var(--cols),1fr)] gap-8"
@@ -265,14 +262,14 @@ export default function MetricsGrid() {
           >
             {defRows.map((r, idx) => (
               <div key={idx} className="flex flex-col items-center">
-                <div className="mb-3 text-2xl font-extrabold text-heading">{r.defect}</div>
-                <div className="flex w-16 items-end justify-center" style={{ height: 220 }}>
+                <div className="mb-3 text-3xl font-bold text-heading">{r.defect}</div>
+                <div className="flex w-16 items-end justify-center" style={{ height: 175 }}>
                   <div
-                    className="w-full rounded-t-xl bg-gradient-to-b from-defect/70 to-[#0a1a33] shadow-[inset_0_-20px_30px_rgba(0,0,0,0.35)]"
-                    style={{ height: `${(r.defect / maxDef) * 160 + 40}px` }}
+                    className="via-brand-defect/40 w-full rounded-t-full bg-gradient-to-b from-defect/90 to-brand-border shadow-[inset_0_-20px_30px_rgba(0,0,0,0.35)] transition-[height] duration-500"
+                    style={{ height: `${(r.defect / maxDef) * 115 + 40}px` }}
                   />
                 </div>
-                <div className="mt-2 text-sm text-sub">{r.label}</div>
+                <div className="mt-2 text-lg text-sub">{r.label}</div>
               </div>
             ))}
           </div>
@@ -283,10 +280,9 @@ export default function MetricsGrid() {
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4">
-      {/* 토글 + 안내문구 */}
       <div className="flex shrink-0 items-center gap-3">
         <ToggleDropdown />
-        <span className="text-sm text-sub">
+        <span className="text-md text-sub">
           {period === 'today'
             ? '오늘 기준 데이터입니다.'
             : period === 'week'

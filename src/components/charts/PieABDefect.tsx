@@ -17,7 +17,7 @@ export default function PieABDefect({ a, b, defect }: Props) {
     a: 'var(--tw-color-brand-a, #cb3cff)', // 보라
     b: 'var(--tw-color-brand-b, #0038ff)', // 파랑
     d: 'var(--tw-color-defect, #39c6ff)', // 하늘
-    bg: 'var(--tw-color-', // 배경 비슷한 톤(스트로크용)
+    bg: 'var(--tw-color-bg', // 배경 비슷한 톤(스트로크용)
   } as const;
 
   return (
@@ -36,7 +36,7 @@ export default function PieABDefect({ a, b, defect }: Props) {
           endAngle={-270}
           // 도넛이 아닌 꽉 찬 원: innerRadius 생략(또는 0)
           // 반응형 컨테이너에 맞춰 퍼센트 사용
-          outerRadius="90%"
+          outerRadius="100%"
           paddingAngle={0} // 섹션간 아주 얇은 간격
           cornerRadius={0} // 끝 둥글게 X (이미지 느낌에 맞춤)
           stroke="none" // 배경색 계열로 얇은 링
