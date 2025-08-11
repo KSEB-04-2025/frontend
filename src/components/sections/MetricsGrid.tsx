@@ -4,6 +4,7 @@ import React from 'react';
 import ToggleDropdown from '@/components/ui/ToggleGroup';
 import { useDashboard } from '@/store/dashboard';
 import { getABStats, getDefectStats, type DailyAB, type DefectItem } from '@/apis/dashboard';
+type CSSVars = React.CSSProperties & { ['--cols']?: number | string };
 
 /** 공통: 날짜 오름차순 정렬 후 최근 n개만 */
 function takeRecentByDate<T extends { date: string }>(arr: T[], n: number) {
@@ -204,7 +205,7 @@ export default function MetricsGrid() {
         ) : (
           <div
             className="mt-3 grid grid-cols-[repeat(var(--cols),1fr)] gap-8"
-            style={{ ['--cols' as any]: abRows.length }}
+            style={{ '--cols': abRows.length } as CSSVars}
           >
             {abRows.map((r, idx) => (
               <div key={idx} className="flex flex-col items-center justify-end">
@@ -258,7 +259,7 @@ export default function MetricsGrid() {
         ) : (
           <div
             className="mt-3 grid grid-cols-[repeat(var(--cols),1fr)] gap-8"
-            style={{ ['--cols' as any]: defRows.length }}
+            style={{ '--cols': defRows.length } as CSSVars}
           >
             {defRows.map((r, idx) => (
               <div key={idx} className="flex flex-col items-center">

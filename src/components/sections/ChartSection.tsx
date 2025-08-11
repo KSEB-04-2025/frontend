@@ -61,7 +61,7 @@ export default function ChartSection() {
   const toPct = (n: number) => (safeTotal > 0 ? `${Math.round((n / safeTotal) * 100)}%` : '-');
 
   // 균일도/군집도
-  const [blocks, setBlocks] = React.useState<UniformityItem[]>([]);
+  const [, setBlocks] = React.useState<UniformityItem[]>([]);
   React.useEffect(() => {
     let alive = true;
     getUniformity()
