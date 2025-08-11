@@ -48,18 +48,22 @@ export default function ScatterUniformityAB({
   regionOpacity = 0.12,
 }: Props) {
   /** 약한 지터로 겹침 완화 */
-  const jitter = (v: number, index: number, amt = 0.4) => {
-    // 인덱스 기반 고정 오프셋으로 일관된 지터 생성
-    const hash = (index * 2654435761) % 2147483647;
-    const normalizedHash = (hash / 2147483647 - 0.5) * 2;
-    return v + normalizedHash * amt;
+  const jitter = (v: number, seed: string | number, amt = 0.4) => {
+    // id/라벨 기반 고정 오프셋으로 렌더/데이터 순서 변경에도 안정적
+    const n =
+      typeof seed === 'number'
+        ? seed
+        : [...seed].reduce((acc, ch) => ((acc << 5) - acc + ch.charCodeAt(0)) | 0, 5381);
+    const mod = Math.abs(n % 2147483647);
+    const normalized = (mod / 2147483647 - 0.5) * 2; // [-1, 1]
+    return v + normalized * amt;
   };
 
   const aPts = React.useMemo(
     () =>
       points
         .filter(p => p.label === 'A')
-        .map((p, i) => ({ x: jitter(p.nclusters, i), y: p.uniformity })),
+        .map(p => ({ x: jitter(p.nclusters, `${p.id}|A`), y: p.uniformity })),
     [points]
   );
 
@@ -67,7 +71,7 @@ export default function ScatterUniformityAB({
     () =>
       points
         .filter(p => p.label === 'B')
-        .map((p, i) => ({ x: jitter(p.nclusters, i + 1000), y: p.uniformity })),
+        .map(p => ({ x: jitter(p.nclusters, `${p.id}|B`), y: p.uniformity })),
     [points]
   );
 
