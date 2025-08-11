@@ -15,13 +15,14 @@ const authClient = axios.create({
 });
 
 let isRefreshing = false;
-let queue: Array<() => void> = [];
+type RetryCallback = (err?: unknown) => void;
+let queue: RetryCallback[] = [];
 
 async function devLogin() {
   const username = process.env.NEXT_PUBLIC_DEV_ID || '';
   const password = process.env.NEXT_PUBLIC_DEV_PW || '';
   if (!username || !password) throw new Error('DEV ID/PW가 .env.local에 없습니다.');
-  await authClient.post('/login', { username, password }); // ★ baseURL에 /api 포함 기준
+  await authClient.post('/login', { username, password });
 }
 
 function shouldSkip(url?: string) {
@@ -51,13 +52,16 @@ axioscommon.interceptors.response.use(
           return axioscommon(cfg);
         } catch (e) {
           isRefreshing = false;
+          const error = e;
+          queue.forEach(cb => cb(error));
           queue = [];
           throw e;
         }
       }
 
       return new Promise((resolve, reject) => {
-        queue.push(() => {
+        queue.push(err => {
+          if (err) return reject(err);
           axioscommon(cfg).then(resolve).catch(reject);
         });
       });

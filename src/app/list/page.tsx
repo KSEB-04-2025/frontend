@@ -1,9 +1,7 @@
 // src/app/list/page.tsx
-import ListSection from '@/components/sections/ListSection';
+import ListSection from '@/components/lists/ListSection';
 
-export const metadata = {
-  title: 'List — ZEZE ONE',
-};
+export const metadata = { title: 'List — ZEZE ONE' };
 
 export default function ListPage() {
   return (
