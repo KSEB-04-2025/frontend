@@ -60,17 +60,6 @@ export default function ChartSection() {
   const safeTotal = total ?? 0;
   const toPct = (n: number) => (safeTotal > 0 ? `${Math.round((n / safeTotal) * 100)}%` : '-');
 
-  // 균일도/군집도
-  const [, setBlocks] = React.useState<UniformityItem[]>([]);
-  React.useEffect(() => {
-    let alive = true;
-    getUniformity()
-      .then(list => alive && setBlocks(list))
-      .catch(() => alive && setBlocks([]));
-    return () => {
-      alive = false;
-    };
-  }, []);
   const [points, setPoints] = React.useState<UniformityItem[]>([]);
   React.useEffect(() => {
     let alive = true;
@@ -116,7 +105,6 @@ export default function ChartSection() {
             points={points}
             xDomain={[0, 120]} // Number of Clusters
             yDomain={[0.6, 1.0]} // Uniformity
-            height={undefined as unknown as number} // ResponsiveContainer가 부모 높이를 사용
             xCut={xCut}
             yCut={yCut}
           />

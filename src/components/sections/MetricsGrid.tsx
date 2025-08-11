@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import ToggleDropdown from '@/components/ui/ToggleGroup';
+import ToggleGroup from '@/components/ui/ToggleGroup';
 import { useDashboard } from '@/store/dashboard';
 import { getABStats, getDefectStats, type DailyAB, type DefectItem } from '@/apis/dashboard';
 type CSSVars = React.CSSProperties & { ['--cols']?: number | string };
@@ -282,7 +282,7 @@ export default function MetricsGrid() {
   return (
     <div className="flex h-full min-h-0 flex-col gap-4">
       <div className="flex shrink-0 items-center gap-3">
-        <ToggleDropdown />
+        <ToggleGroup />
         <span className="text-md text-sub">
           {period === 'today'
             ? '오늘 기준 데이터입니다.'

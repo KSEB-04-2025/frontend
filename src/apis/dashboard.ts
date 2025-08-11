@@ -61,7 +61,11 @@ export async function getDefectStats(period: Period) {
   if (Array.isArray(data)) return data as DefectItem[];
 
   if (typeof data === 'number') {
-    const today = new Date().toISOString().slice(0, 10);
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const today = `${yyyy}-${mm}-${dd}`;
     return [{ date: today, xcount: data }];
   }
 

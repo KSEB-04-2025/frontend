@@ -14,12 +14,7 @@ import {
   ReferenceLine,
   ReferenceArea,
 } from 'recharts';
-
-type UniformityItem = {
-  uniformity: number; // Y
-  nclusters: number; // X
-  label: 'A' | 'B';
-};
+import type { UniformityItem } from '@/apis/dashboard';
 
 type Props = {
   points: UniformityItem[];

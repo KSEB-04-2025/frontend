@@ -9,7 +9,7 @@ const LABEL: Record<'today' | 'week' | 'month', string> = {
   month: 'Month',
 };
 
-export default function ToggleDropdown() {
+export default function ToggleGroup() {
   const period = useDashboard(s => s.period);
   const setPeriod = useDashboard(s => s.setPeriod);
   const [open, setOpen] = React.useState(false);
@@ -18,6 +18,10 @@ export default function ToggleDropdown() {
 
   // 바깥 클릭 닫기
   React.useEffect(() => {
+    if (open) {
+      // 렌더 후 포커스
+      requestAnimationFrame(() => menuRef.current?.focus());
+    }
     function onClick(e: MouseEvent) {
       if (!open) return;
       const t = e.target as Node;
@@ -28,6 +32,24 @@ export default function ToggleDropdown() {
     function onKey(e: KeyboardEvent) {
       if (!open) return;
       if (e.key === 'Escape') setOpen(false);
+      const order = ['today', 'week', 'month'] as const;
+      const i = order.indexOf(period);
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const next = order[(i + 1) % order.length];
+        setPeriod(next);
+        // 시각적 활성 옵션 업데이트 (aria-activedescendant가 period에 연동됨)
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prev = order[(i - 1 + order.length) % order.length];
+        setPeriod(prev);
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        setOpen(false);
+        btnRef.current?.focus();
+      }
     }
     window.addEventListener('mousedown', onClick);
     window.addEventListener('keydown', onKey);
@@ -75,7 +97,7 @@ export default function ToggleDropdown() {
           ref={menuRef}
           role="listbox"
           aria-activedescendant={`period-${period}`}
-          tabIndex={-1}
+          tabIndex={0}
           className="absolute z-50 mt-2 w-36 overflow-hidden rounded-md border border-brand-border bg-day shadow-side outline-none"
         >
           {(['today', 'week', 'month'] as const).map(p => {

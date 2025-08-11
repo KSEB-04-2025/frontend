@@ -77,7 +77,6 @@ export default function ListSection() {
   }, [query, pickedDate, sortOrder]);
 
   const total = filtered.length;
- 
 
   return (
     <section className="space-y-4">
