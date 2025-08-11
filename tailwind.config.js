@@ -16,12 +16,12 @@ module.exports = {
         inter: ['Inter', 'sans-serif'],
       },
       boxShadow: {
-        side: '0px 8px 28px rgba(1, 5, 17, 0.3)',
+        side: '0px 8px 28px rgba(1, 5, 11, 0.3)',
       },
       colors: {
         'brand-a': '#cb3cff',
         'brand-b': '#0038ff',
-        defect: '#00c2ff',
+        defect: '#00C2FF',
         day: '#7F25FB',
         bg: '#081028',
         box: '#0B1739',
