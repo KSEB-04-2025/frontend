@@ -1,14 +1,20 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { login } from '@/apis/auth';
 
-function LoginInner() {
+type MsgKey = 'expired' | 'forbidden' | 'net' | null;
+
+export default function SigninClient({
+  redirectTo,
+  msgKey,
+}: {
+  redirectTo: string;
+  msgKey: MsgKey;
+}) {
   const router = useRouter();
-  const search = useSearchParams();
-  const redirectTo = search.get('from') || '/dashboard';
 
   const [id, setId] = useState('');
   const [pw, setPw] = useState('');
@@ -17,16 +23,13 @@ function LoginInner() {
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    const msg =
-      search.get('expired') === '1'
-        ? '세션이 만료되었습니다. 다시 로그인해 주세요.'
-        : search.get('forbidden') === '1'
-          ? '접근 권한이 없습니다. 다시 로그인해 주세요.'
-          : search.get('net') === '1'
-            ? '네트워크 또는 CORS 문제로 인증이 필요합니다. 다시 로그인해 주세요.'
-            : null;
-    if (msg) setErr(msg);
-  }, [search]);
+    const map: Record<Exclude<MsgKey, null>, string> = {
+      expired: '세션이 만료되었습니다. 다시 로그인해 주세요.',
+      forbidden: '접근 권한이 없습니다. 다시 로그인해 주세요.',
+      net: '네트워크 또는 CORS 문제로 인증이 필요합니다. 다시 로그인해 주세요.',
+    };
+    setErr(msgKey ? map[msgKey] : null);
+  }, [msgKey]);
 
   function axMsg(e: unknown): string {
     if (axios.isAxiosError(e)) {
@@ -108,13 +111,5 @@ function LoginInner() {
         <div>© 2025 K-Software Empowerment BootCamp. Project by zezeone</div>
       </footer>
     </div>
-  );
-}
-
-export default function Page() {
-  return (
-    <Suspense fallback={<div className="min-h-screen w-full bg-[#0c1222]" />}>
-      <LoginInner />
-    </Suspense>
   );
 }

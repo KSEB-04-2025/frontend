@@ -1,13 +1,11 @@
-// src/components/sections/ChartSection.tsx
 'use client';
 
 import React from 'react';
 import { getAdminDashboardSummary, getUniformity, type UniformityItem } from '@/apis/dashboard';
 import PieABDefect from '@/components/charts/PieABDefect';
-import ScatterUniformityAB from '@/components/charts/ScatterUniformityAB';
+import KDEUniformityStandalone from '@/components/charts/KDEUniformityStandalone';
 
 export default function ChartSection() {
-  // 시각(폭 고정으로 점프 방지)
   const [now, setNow] = React.useState<Date | null>(null);
   React.useEffect(() => {
     setNow(new Date());
@@ -64,15 +62,18 @@ export default function ChartSection() {
   React.useEffect(() => {
     let alive = true;
     getUniformity()
-      .then(list => alive && setPoints(list))
-      .catch(() => alive && setPoints([]));
+      .then(list => {
+        console.log('[uniformity] len=', list?.length, list?.slice?.(0, 3));
+        if (alive) setPoints(list ?? []);
+      })
+      .catch(err => {
+        console.error('[uniformity] error', err);
+        if (alive) setPoints([]);
+      });
     return () => {
       alive = false;
     };
   }, []);
-
-  const [xCut] = React.useState<number | undefined>(undefined); // 예: 24
-  const [yCut] = React.useState<number | undefined>(undefined); // 예: 0.9
 
   return (
     <div className="grid min-h-0 grid-cols-1 items-stretch gap-7 lg:h-full lg:grid-cols-2 lg:[grid-template-columns:520px_1fr] lg:[grid-template-rows:auto_1fr]">
@@ -89,35 +90,37 @@ export default function ChartSection() {
         </span>
       </div>
 
-      {/* Cluster / Uniformity (Scatter / Bubble) */}
-      <section className="overflow-hidden rounded-xl border border-brand-border bg-box p-5 lg:row-span-2 lg:h-full">
+      <section className="overflow-hidden rounded-lg border border-brand-border bg-box p-5 lg:row-span-2 lg:h-full">
         <div className="mb-4">
           <h2 className="text-[28px] font-extrabold leading-tight text-heading lg:text-[34px]">
             Cluster / Uniformity
           </h2>
-          <p className="mt-2 text-sm text-sub">
-            균일도·군집도 기준의 A/B 분포를 산점도로 표시합니다.
+          <p className="text-md mt-2 text-sub">
+            X축은 군집도(cluster) / Y축은 균일도 입니다 (uniformity)
           </p>
         </div>
 
-        <div className="grid h-[300px] place-items-center rounded-lg lg:h-[calc(100%-64px)]">
-          <ScatterUniformityAB
+        <div className="grid h-[300px] place-items-center rounded-lg lg:h-[calc(100%-68px)]">
+          <KDEUniformityStandalone
             points={points}
-            xDomain={[0, 120]} // Number of Clusters
-            yDomain={[0.6, 1.0]} // Uniformity
-            xCut={xCut}
-            yCut={yCut}
+            xDomain={[0, 120]}
+            yDomain={[0.3, 1.0]}
+            height={300}
+            xCut={24}
+            yCut={0.9}
+            shadeARegion
+            debugPoints={false}
           />
         </div>
       </section>
 
       {/* Total Product */}
-      <section className="overflow-hidden rounded-xl border border-brand-border bg-box p-5 lg:h-full">
+      <section className="overflow-hidden rounded-lg border border-brand-border bg-box p-5 lg:h-full">
         <div className="mb-4 flex items-center gap-2">
           <h2 className="text-[28px] font-extrabold leading-tight text-heading lg:text-[34px]">
             Total Product
           </h2>
-          <span className="text-sm text-sub">현재까지의 전체 생산량</span>
+          <span className="text-lg text-sub">현재까지의 전체 생산량</span>
         </div>
 
         <div className="flex flex-col rounded-xl lg:h-[calc(100%-64px)]">
@@ -140,8 +143,8 @@ export default function ChartSection() {
             {/* 우측 수치 */}
             <div className="col-span-12 lg:col-span-6">
               <div className="mb-6">
-                <div className="text-xs text-sub">총 생산량</div>
-                <div className="mt-1 text-[40px] font-semibold leading-none text-heading">
+                <div className="text-md text-sub">총 생산량</div>
+                <div className="mt-1 text-[50px] font-semibold leading-none text-heading">
                   {total ?? '-'}
                 </div>
               </div>
