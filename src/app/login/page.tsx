@@ -8,7 +8,8 @@ import { login } from '@/apis/auth';
 function LoginInner() {
   const router = useRouter();
   const search = useSearchParams();
-  const redirectTo = search.get('from') || '/dashboard';
+  const from = search.get('from');
+  const redirectTo = from && from.startsWith('/') && !from.startsWith('//') ? from : '/dashboard';
 
   const [id, setId] = useState('');
   const [pw, setPw] = useState('');

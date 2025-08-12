@@ -15,6 +15,10 @@ export default function SigninClient({
   msgKey: MsgKey;
 }) {
   const router = useRouter();
+  const safeRedirectTo =
+    redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')
+      ? redirectTo
+      : '/dashboard';
 
   const [id, setId] = useState('');
   const [pw, setPw] = useState('');
@@ -46,7 +50,7 @@ export default function SigninClient({
     setLoading(true);
     try {
       await login(id, pw);
-      router.replace(redirectTo);
+      router.replace(safeRedirectTo);
     } catch (e) {
       setErr(axMsg(e));
     } finally {

@@ -22,8 +22,7 @@ export default function NavigationBar() {
       </div>
       <nav className="mt-2 flex flex-col gap-1 px-2">
         {items.map(({ href, label, icon: Icon }) => {
-          const active =
-            href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href);
+          const active = pathname === href || pathname.startsWith(`${href}/`);
           return (
             <Link
               key={href}

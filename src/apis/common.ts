@@ -33,6 +33,7 @@ axioscommon.interceptors.response.use(
     const resp = err.response;
     const cfg = (err.config || {}) as RetriableConfig;
 
+    if (cfg?._skipAuth) return Promise.reject(err);
     // 네트워크/CORS 차단 등으로 응답 자체가 없을 때
     if (!resp) {
       goLogin('net');
@@ -40,7 +41,6 @@ axioscommon.interceptors.response.use(
     }
 
     // 로그인/리프레시 같은 인증 API 자체는 건너뛴다
-    if (cfg?._skipAuth) return Promise.reject(err);
 
     // 비로그인/세션만료/권한없음 → 로그인 페이지 이동
     if (resp.status === 401) {

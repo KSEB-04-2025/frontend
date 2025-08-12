@@ -22,7 +22,7 @@ const SZ = {
 };
 
 function takeRecentByDate<T extends { date: string }>(arr: T[], n: number) {
-  return [...arr].sort((a, b) => (a.date < b.date ? -1 : 1)).slice(-n);
+  return [...arr].sort((a, b) => a.date.localeCompare(b.date)).slice(-n);
 }
 const labelWeek = (iso: string) => `${iso.slice(2, 4)}.${iso.slice(5, 7)}.${iso.slice(8, 10)}`;
 const labelMonth = (iso: string) => `${Number(iso.slice(5, 7))}월`;
