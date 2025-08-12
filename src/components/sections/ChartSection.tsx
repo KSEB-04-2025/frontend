@@ -84,7 +84,7 @@ export default function ChartSection() {
         >
           {timeText}
         </span>
-        <span className="text-4xl font-extrabold tracking-wide text-sub" suppressHydrationWarning>
+        <span className="text-4xl font-bold tracking-wide text-sub" suppressHydrationWarning>
           {dateText}
         </span>
       </div>

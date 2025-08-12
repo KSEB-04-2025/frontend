@@ -7,7 +7,7 @@ import { Home, BarChart2 } from 'lucide-react';
 export default function NavigationBar() {
   const pathname = usePathname();
   const items = [
-    { href: '/', label: 'Dashboard', icon: Home },
+    { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/list', label: 'List', icon: BarChart2 },
   ];
 
@@ -22,7 +22,8 @@ export default function NavigationBar() {
       </div>
       <nav className="mt-2 flex flex-col gap-1 px-2">
         {items.map(({ href, label, icon: Icon }) => {
-          const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
+          const active =
+            href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href);
           return (
             <Link
               key={href}

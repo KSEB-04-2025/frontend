@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import NavigationBar from '@/components/sections/NavigationBar';
+import Shell from '@/components/Shell';
 
 export const metadata: Metadata = {
   title: 'ZEZE ONE',
@@ -11,10 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body className="text-foreground min-h-screen bg-bg antialiased">
-        <div className="grid grid-cols-[240px_1fr]">
-          <NavigationBar />
-          <main className="h-dvh overflow-hidden px-6 py-4">{children}</main>
-        </div>
+        <Shell>{children}</Shell>
       </body>
     </html>
   );
