@@ -11,7 +11,7 @@ declare module 'axios' {
 type RetriableConfig = InternalAxiosRequestConfig & { _retry?: boolean; _skipAuth?: boolean };
 
 export const axioscommon = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.zezeone-sf.site',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   withCredentials: true, // 세션 쿠키 사용 시 필수
   headers: { Accept: 'application/json' },
 });
