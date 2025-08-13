@@ -23,10 +23,12 @@ export default function ListSection() {
   const [err, setErr] = React.useState<string | null>(null);
 
   const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('asc');
+  const [sortKey, setSortKey] = React.useState<'id' | 'grade' | 'date'>('date');
   const [pickedDate, setPickedDate] = React.useState<string | null>(null);
+  const [pickedGrade, setPickedGrade] = React.useState<'A' | 'B' | 'defect' | null>(null);
 
   const [page, setPage] = React.useState(1);
-  const [pageSize, setPageSize] = React.useState(20); // 한 페이지 20개
+  const [pageSize, setPageSize] = React.useState(20);
 
   React.useEffect(() => {
     (async () => {
@@ -44,7 +46,7 @@ export default function ListSection() {
     })();
   }, []);
 
-  // 검색/날짜/정렬 계산
+  
   const filtered = React.useMemo(() => {
     let result = [...rows];
 
@@ -63,20 +65,41 @@ export default function ListSection() {
       result = result.filter(r => r.date === targetYmd);
     }
 
+    if (pickedGrade) {
+      result = result.filter(r => r.grade === pickedGrade);
+    }
+
+    const gradeOrder = { A: 0, B: 1, defect: 2 } as const;
+
     result.sort((a, b) => {
-      const da = ymdToMs(a.date);
-      const db = ymdToMs(b.date);
-      return sortOrder === 'asc' ? da - db : db - da;
+      let cmp = 0;
+      if (sortKey === 'id') {
+        cmp = a.id.localeCompare(b.id);
+      } else if (sortKey === 'grade') {
+        cmp = gradeOrder[a.grade] - gradeOrder[b.grade];
+      } else {
+        cmp = ymdToMs(a.date) - ymdToMs(b.date);
+      }
+      return sortOrder === 'asc' ? cmp : -cmp;
     });
 
     return result;
-  }, [rows, query, pickedDate, sortOrder]);
+  }, [rows, query, pickedDate, pickedGrade, sortKey, sortOrder]);
 
   React.useEffect(() => {
     setPage(1);
-  }, [query, pickedDate, sortOrder]);
+  }, [query, pickedDate, pickedGrade, sortKey, sortOrder]);
 
   const total = filtered.length;
+
+  const handleSort = (key: 'id' | 'grade' | 'date') => {
+    if (sortKey === key) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortOrder('asc');
+    }
+  };
 
   return (
     <section className="space-y-4">
@@ -86,7 +109,10 @@ export default function ListSection() {
           onToggleSort={() => setSortOrder(p => (p === 'asc' ? 'desc' : 'asc'))}
           onPickDate={d => setPickedDate(d)}
           currentDate={pickedDate}
+          currentGrade={pickedGrade}
+          onPickGrade={setPickedGrade}
         />
+
         <div className="flex-1">
           <SearchBar
             value={query}
@@ -97,14 +123,42 @@ export default function ListSection() {
         </div>
       </div>
 
-      {pickedDate && (
-        <div className="text-m text-sub">
-          날짜: <b className="text-heading">{pickedDate}</b>
-          <button className="ml-2 underline hover:opacity-80" onClick={() => setPickedDate(null)}>
-            해제
-          </button>
-        </div>
-      )}
+      
+      <div className="text-m text-sub flex items-center gap-3">
+        
+        <span className="inline-flex items-center min-w-[140px]">
+          {pickedGrade ? (
+            <>
+              등급: <b className="ml-1 text-heading">{pickedGrade}</b>
+              <button
+                className="ml-2 underline hover:opacity-80"
+                onClick={() => setPickedGrade(null)}
+              >
+                해제
+              </button>
+            </>
+          ) : (
+            <span className="invisible">등급: defect 해제</span>
+          )}
+        </span>
+
+        {/* 날짜 영역: 동일 방식(원하면 폭 조절) */}
+        <span className="inline-flex items-center min-w-[180px]">
+          {pickedDate ? (
+            <>
+              날짜: <b className="ml-1 text-heading">{pickedDate}</b>
+              <button
+                className="ml-2 underline hover:opacity-80"
+                onClick={() => setPickedDate(null)}
+              >
+                해제
+              </button>
+            </>
+          ) : (
+            <span className="invisible">날짜: 2025.08.12 해제</span>
+          )}
+        </span>
+      </div>
 
       {loading && (
         <div className="rounded-xl border border-brand-border bg-box/60 px-6 py-8 text-sub">
@@ -118,7 +172,14 @@ export default function ListSection() {
       )}
       {!loading && !err && (
         <>
-          <ListTable rows={filtered} page={page} pageSize={pageSize} />
+          <ListTable
+            rows={filtered}
+            page={page}
+            pageSize={pageSize}
+            sortKey={sortKey}
+            sortOrder={sortOrder}
+            onSort={handleSort}
+          />
 
           <FooterPagination
             total={total}

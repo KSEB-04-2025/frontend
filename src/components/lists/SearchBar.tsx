@@ -1,5 +1,3 @@
-// src/components/lists/SearchBar.tsx
-
 import React from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 

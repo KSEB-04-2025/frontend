@@ -16,7 +16,6 @@ import {
 
 type Health = {
   ok?: boolean;
-  overall?: string;
   timestamp?: string;
   defect?:string;
   classify?:string;
@@ -52,11 +51,6 @@ export default function NavigationBar() {
 );
 
   
-  const overall = (data?.overall ?? (data?.ok ? 'ok' : undefined))?.toLowerCase();
-  const isOk = overall === 'ok';
-  const updatedText = data?.timestamp
-    ? new Date(data.timestamp).toLocaleString()
-    : '—';
 
   return (
     <aside className="border-muted relative sticky top-0 h-dvh w-60 shrink-0 bg-nav shadow-side">
@@ -132,7 +126,7 @@ export default function NavigationBar() {
 
     
     const rows = [
-  { label: '분류 서버', value: data?.classify ?? (data?.overall ? 'ok' : undefined) },
+  { label: '분류 서버', value: data?.classify },
   { label: '결함 서버', value: data?.defect },
   { label: '카메라1',  value: data?.ir1 },
   { label: '카메라2',  value: data?.ir2 },
