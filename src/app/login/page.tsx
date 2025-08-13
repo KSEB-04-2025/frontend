@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { login } from '@/apis/auth';
+import { Eye, EyeOff } from 'lucide-react'; 
 
 function LoginInner() {
   const router = useRouter();
@@ -60,8 +61,11 @@ function LoginInner() {
 
           <form onSubmit={onSubmit} className="space-y-5">
             <div>
-              <label className="mb-2 block text-sm text-gray-300">아이디</label>
+              <label htmlFor="login-id" className="mb-2 block text-sm text-gray-300">아이디</label>
               <input
+                id="login-id"
+                type="text"                    
+                name="username"                
                 value={id}
                 onChange={e => setId(e.target.value)}
                 placeholder="아이디"
@@ -71,10 +75,12 @@ function LoginInner() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm text-gray-300">비밀번호</label>
+              <label htmlFor="login-pw" className="mb-2 block text-sm text-gray-300">비밀번호</label>
               <div className="relative">
                 <input
+                  id="login-pw"
                   type={showPw ? 'text' : 'password'}
+                  name="password"             
                   value={pw}
                   onChange={e => setPw(e.target.value)}
                   placeholder="비밀번호"
@@ -84,9 +90,10 @@ function LoginInner() {
                 <button
                   type="button"
                   onClick={() => setShowPw(s => !s)}
+                  aria-label={showPw ? '비밀번호 숨기기' : '비밀번호 보기'}  
                   className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-gray-300 hover:bg-white/5"
                 >
-                  👁️
+                  {showPw ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
                 </button>
               </div>
             </div>
