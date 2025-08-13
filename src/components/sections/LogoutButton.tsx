@@ -7,7 +7,7 @@ import { LogOut, RefreshCw } from 'lucide-react';
 
 export default function LogoutButton({ className = '' }: { className?: string }) {
   const [loading, setLoading] = useState(false);
-  const router = useRouter(); // ✅ 사용
+  const router = useRouter();
 
   async function onClick() {
     if (loading) return;

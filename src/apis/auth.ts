@@ -23,7 +23,7 @@ export async function login(username: string, password: string) {
 }
 
 export async function logout() {
-  const res = await axioscommon.post<ApiMessage>('/logout', undefined, {
+  const res = await axioscommon.post<ApiMessage>('/login/logout', undefined, {
     withCredentials: true,
     _skipAuth: true,
     validateStatus: s => (s ?? 0) < 500,

@@ -26,8 +26,6 @@ type Props = {
 };
 
 const Toolbar: React.FC<Props> = ({
-  sortOrder,
-  onToggleSort,
   onPickDate,
   currentDate,
   currentGrade = null,

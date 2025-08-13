@@ -22,11 +22,9 @@ function LoginInner() {
     const msg =
       search.get('expired') === '1'
         ? '세션이 만료되었습니다. 다시 로그인해 주세요.'
-        : search.get('forbidden') === '1'
-          ? '접근 권한이 없습니다. 다시 로그인해 주세요.'
-          : search.get('net') === '1'
-            ? '네트워크 또는 CORS 문제로 인증이 필요합니다. 다시 로그인해 주세요.'
-            : null;
+        : search.get('net') === '1'
+          ? '네트워크 또는 CORS 문제로 인증이 필요합니다. 다시 로그인해 주세요.'
+          : null;
     if (msg) setErr(msg);
   }, [search]);
 
