@@ -17,7 +17,7 @@ export default function LogoutButton({ className = '' }: { className?: string })
     setLoading(true);
     try {
       await logout();
-      router.replace('/login?loggedout=1'); 
+      router.replace('/login?loggedout=1');
     } catch (e) {
       console.error(e);
     } finally {

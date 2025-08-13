@@ -163,7 +163,7 @@ export default function MetricsGrid() {
                 {todayA ?? '-'}
               </span>
             </div>
-            <span className="absolute bottom-3 right-4 text-base text-sub/90">개</span>
+            <span className="text-md absolute bottom-3 right-4 text-sub/90">개</span>
           </div>
 
           {/* defect */}
@@ -176,7 +176,7 @@ export default function MetricsGrid() {
                 {todayDef ?? '-'}
               </span>
             </div>
-            <span className="absolute bottom-3 right-4 text-sm text-sub/90">개</span>
+            <span className="text-md absolute bottom-3 right-4 text-sub/90">개</span>
           </div>
 
           {/* B */}
@@ -189,7 +189,7 @@ export default function MetricsGrid() {
                 {todayB ?? '-'}
               </span>
             </div>
-            <span className="absolute bottom-3 right-4 text-sm text-sub/90">개</span>
+            <span className="text-md absolute bottom-3 right-4 text-sub/90">개</span>
           </div>
         </section>
       </div>

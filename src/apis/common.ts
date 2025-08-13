@@ -1,6 +1,4 @@
-
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-
 
 declare module 'axios' {
   interface AxiosRequestConfig {
@@ -11,8 +9,8 @@ declare module 'axios' {
 type RetriableConfig = InternalAxiosRequestConfig & { _retry?: boolean; _skipAuth?: boolean };
 
 export const axioscommon = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ,
-  withCredentials: true, 
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  withCredentials: true,
   headers: { Accept: 'application/json' },
 });
 
@@ -34,15 +32,12 @@ axioscommon.interceptors.response.use(
     const cfg = (err.config || {}) as RetriableConfig;
 
     if (cfg?._skipAuth) return Promise.reject(err);
-   
+
     if (!resp) {
       goLogin('net');
       return Promise.reject(err);
     }
 
-   
-
-    
     if (resp.status === 401) {
       goLogin('expired');
     } else if (resp.status === 403) {

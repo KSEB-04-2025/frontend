@@ -46,7 +46,6 @@ export default function ListSection() {
     })();
   }, []);
 
-  
   const filtered = React.useMemo(() => {
     let result = [...rows];
 
@@ -123,10 +122,8 @@ export default function ListSection() {
         </div>
       </div>
 
-      
-      <div className="text-m text-sub flex items-center gap-3">
-        
-        <span className="inline-flex items-center min-w-[140px]">
+      <div className="text-m flex items-center gap-3 text-sub">
+        <span className="inline-flex min-w-[140px] items-center">
           {pickedGrade ? (
             <>
               등급: <b className="ml-1 text-heading">{pickedGrade}</b>
@@ -143,7 +140,7 @@ export default function ListSection() {
         </span>
 
         {/* 날짜 영역: 동일 방식(원하면 폭 조절) */}
-        <span className="inline-flex items-center min-w-[180px]">
+        <span className="inline-flex min-w-[180px] items-center">
           {pickedDate ? (
             <>
               날짜: <b className="ml-1 text-heading">{pickedDate}</b>
