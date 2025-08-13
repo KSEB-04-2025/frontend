@@ -10,15 +10,21 @@
   },
   "dependencies": {
     "axios": "^1.11.0",
+    "d3-contour": "^4.0.2",
+    "d3-geo": "^3.1.1",
+    "lucide-react": "^0.539.0",
     "next": "15.4.5",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-icons": "^5.5.0",
+    "recharts": "^3.1.2",
     "tailwindcss": "^3.4.0",
     "zustand": "^5.0.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/d3-contour": "^3.0.6",
+    "@types/d3-geo": "^3.1.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
