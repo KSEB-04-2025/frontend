@@ -12,7 +12,7 @@ type RetriableConfig = InternalAxiosRequestConfig & { _retry?: boolean; _skipAut
 
 export const axioscommon = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  withCredentials: true, // 세션 쿠키 사용 시 필수
+  withCredentials: true,
   headers: { Accept: 'application/json' },
 });
 

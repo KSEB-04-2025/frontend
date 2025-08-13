@@ -83,30 +83,25 @@ export default function KDEUniformityStandalone({
     return () => obs.disconnect();
   }, []);
 
-  // 유니크 ID들 (clip/blur/gradient 충돌 방지)
   const uid = React.useId().replace(/:/g, '');
   const clipId = `kde-clip-${uid}`;
   const blurId = `kde-blur-${uid}`;
   const gradId = `kde-grad-${uid}`;
 
-  // 레이아웃
-  const margin = { top: 8, right: 16, bottom: 36, left: 48 };
+  const margin = { top: 8, right: 16, bottom: 60, left: 80 };
   const W = Math.max(1, width);
   const H = height;
   const plotW = Math.max(1, W - margin.left - margin.right);
   const plotH = Math.max(1, H - margin.top - margin.bottom);
 
-  // 데이터
   const data: Pt[] = React.useMemo(() => {
     const src = labelFilter ? points.filter(p => p.label === labelFilter) : points;
     return src.map(p => ({ x: p.nclusters, y: p.uniformity }));
   }, [points, labelFilter]);
 
-  // 스케일
   const sx = React.useMemo(() => scaleLinear().domain(xDomain).range([0, plotW]), [xDomain, plotW]);
   const sy = React.useMemo(() => scaleLinear().domain(yDomain).range([plotH, 0]), [yDomain, plotH]);
 
-  // 픽셀 좌표
   const pts = React.useMemo<[number, number][]>(
     () => data.map(d => [sx(d.x), sy(d.y)]),
     [data, sx, sy]
@@ -126,7 +121,6 @@ export default function KDEUniformityStandalone({
   const path = React.useMemo(() => geoPath(), []);
   const pal = PALETTES[palette];
 
-  // 정규화(등고선 값 → 0~1)
   const [vmin, vmax] = React.useMemo(() => {
     if (!contours.length) return [0, 1];
     let mi = Infinity,
@@ -151,7 +145,6 @@ export default function KDEUniformityStandalone({
     return Array.from({ length: 5 }, (_, i) => Number((y0 + step * i).toFixed(2)));
   }, [yDomain]);
 
-  // 임계치 픽셀(플롯 좌표; 선을 또렷하게 0.5px 스냅)
   const xCutPx = xCut != null ? Math.round(sx(xCut)) + 0.5 : undefined;
   const yCutPx = yCut != null ? Math.round(sy(yCut)) + 0.5 : undefined;
 
@@ -170,12 +163,10 @@ export default function KDEUniformityStandalone({
             ))}
           </linearGradient>
           <clipPath id={clipId}>
-            {/* ⬇️ 플롯 좌표계(0,0) 기준의 클립 사각형 */}
             <rect x="0" y="0" width={plotW} height={plotH} rx="6" ry="6" />
           </clipPath>
         </defs>
 
-        {/* ==== 플롯 영역(좌표계 통일) ==== */}
         <g transform={`translate(${margin.left},${margin.top})`}>
           {/* 격자 */}
           {XTICKS.map((tx, i) => {
@@ -191,7 +182,6 @@ export default function KDEUniformityStandalone({
             );
           })}
 
-          {/* 임계영역(왼쪽-위) */}
           {shadeARegion && xCutPx != null && yCutPx != null && (
             <rect
               x={0}
@@ -227,7 +217,6 @@ export default function KDEUniformityStandalone({
               ))}
           </g>
 
-          {/* 임계선 + 라벨 (플롯 좌표계) */}
           {xCutPx != null && (
             <>
               <line
@@ -261,8 +250,8 @@ export default function KDEUniformityStandalone({
 
           {/* 축 라벨/눈금 */}
           <text
-            x={plotW / 8}
-            y={plotH + 28}
+            x={plotW / 2}
+            y={plotH + 50}
             fill="rgba(255,255,255,0.85)"
             fontSize={17}
             textAnchor="middle"
@@ -281,7 +270,7 @@ export default function KDEUniformityStandalone({
               {tx}
             </text>
           ))}
-          <g transform={`translate(-35, ${plotH / 2}) rotate(-90)`}>
+          <g transform={`translate(-55, ${plotH / 2}) rotate(-90)`}>
             <text fill="rgba(255,255,255,0.85)" fontSize={17} textAnchor="middle">
               Uniformity
             </text>
