@@ -43,7 +43,7 @@ npm install
 npm run dev
 
 # 4. 환경변수 (.env.local)
-NEXT_PUBLIC_API_BASE=https://api.zezeone-sf.site
+NEXT_PUBLIC_API_BASE_URL=https://api.zezeone-sf.site/api
 ```
 
 
