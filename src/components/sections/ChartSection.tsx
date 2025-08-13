@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
-import { getAdminDashboardSummary, getUniformity, type UniformityItem } from '@/apis/dashboard';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { getAdminDashboardSummary, getUniformity } from '@/apis/dashboard';
 import PieABDefect from '@/components/charts/PieABDefect';
 import KDEUniformityStandalone from '@/components/charts/KDEUniformityStandalone';
 
 export default function ChartSection() {
+  // 시계(SSR 가변값 주의)
   const [now, setNow] = React.useState<Date | null>(null);
   React.useEffect(() => {
     setNow(new Date());
@@ -21,59 +23,29 @@ export default function ChartSection() {
       second: '2-digit',
     }) ?? '';
   const dateText = now
-    ? `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(
-        now.getDate()
-      ).padStart(2, '0')} ${day[now.getDay()]}`
+    ? `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} ${day[now.getDay()]}`
     : '';
 
-  // 요약
-  const [total, setTotal] = React.useState<number | null>(null);
-  const [aCnt, setACnt] = React.useState(0);
-  const [bCnt, setBCnt] = React.useState(0);
-  const [loadingSummary, setLoadingSummary] = React.useState(false);
+  // ✅ 요약 폴링(3초)
+  const { data: summary, isFetching: fetchingSummary } = useQuery({
+    queryKey: ['dashboard', 'summary'],
+    queryFn: getAdminDashboardSummary,
+    refetchInterval: 3000,
+  });
 
-  React.useEffect(() => {
-    let alive = true;
-    setLoadingSummary(true);
-    getAdminDashboardSummary()
-      .then(d => {
-        if (!alive) return;
-        setTotal(d.totalProducts);
-        setACnt(d.aqualityProducts);
-        setBCnt(d.bqualityProducts);
-      })
-      .catch(() => {
-        if (!alive) return;
-        setTotal(null);
-        setACnt(0);
-        setBCnt(0);
-      })
-      .finally(() => alive && setLoadingSummary(false));
-    return () => {
-      alive = false;
-    };
-  }, []);
-
+  const total = summary?.totalProducts ?? null;
+  const aCnt = summary?.aqualityProducts ?? 0;
+  const bCnt = summary?.bqualityProducts ?? 0;
   const defectCnt = Math.max(0, (total ?? 0) - aCnt - bCnt);
   const safeTotal = total ?? 0;
   const toPct = (n: number) => (safeTotal > 0 ? `${Math.round((n / safeTotal) * 100)}%` : '-');
 
-  const [points, setPoints] = React.useState<UniformityItem[]>([]);
-  React.useEffect(() => {
-    let alive = true;
-    getUniformity()
-      .then(list => {
-        console.log('[uniformity] len=', list?.length, list?.slice?.(0, 3));
-        if (alive) setPoints(list ?? []);
-      })
-      .catch(err => {
-        console.error('[uniformity] error', err);
-        if (alive) setPoints([]);
-      });
-    return () => {
-      alive = false;
-    };
-  }, []);
+  const { data: points = [] } = useQuery({
+    queryKey: ['uniformity'],
+    queryFn: getUniformity,
+    refetchInterval: 10000,
+    placeholderData: keepPreviousData,
+  });
 
   return (
     <div className="grid min-h-0 grid-cols-1 items-stretch gap-7 lg:h-full lg:grid-cols-2 lg:[grid-template-columns:520px_1fr] lg:[grid-template-rows:auto_1fr]">
@@ -90,17 +62,18 @@ export default function ChartSection() {
         </span>
       </div>
 
+      {/* 우측: KDE */}
       <section className="overflow-hidden rounded-lg border border-brand-border bg-box p-5 lg:row-span-2 lg:h-full">
         <div className="mb-4">
           <h2 className="text-[28px] font-extrabold leading-tight text-heading lg:text-[34px]">
             Cluster / Uniformity
           </h2>
           <p className="text-md mt-2 text-sub">
-            X축은 군집도(cluster) / Y축은 균일도 입니다 (uniformity)
+            X축은 군집도(cluster) / Y축은 균일도 (uniformity) 입니다.
           </p>
         </div>
 
-        <div className="grid h-[300px] place-items-center rounded-lg lg:h-[calc(100%-68px)]">
+        <div className="place-items-right grid h-[300px] rounded-lg lg:h-[calc(100%-80px)]">
           <KDEUniformityStandalone
             points={points}
             xDomain={[0, 120]}
@@ -114,7 +87,7 @@ export default function ChartSection() {
         </div>
       </section>
 
-      {/* Total Product */}
+      {/* 좌측: Total Product */}
       <section className="overflow-hidden rounded-lg border border-brand-border bg-box p-5 lg:h-full">
         <div className="mb-4 flex items-center gap-2">
           <h2 className="text-[28px] font-extrabold leading-tight text-heading lg:text-[34px]">
@@ -125,7 +98,7 @@ export default function ChartSection() {
 
         <div className="flex flex-col rounded-xl lg:h-[calc(100%-64px)]">
           <div className="grid h-full min-h-0 grid-cols-12 gap-6">
-            {/* 파이 (정중앙 정렬) */}
+            {/* 파이 */}
             <div className="col-span-12 lg:col-span-6">
               <div className="flex h-full items-center justify-center">
                 <div className="aspect-square w-[200px] lg:w-[280px]">
@@ -133,7 +106,7 @@ export default function ChartSection() {
                     <PieABDefect a={aCnt} b={bCnt} defect={defectCnt} />
                   ) : (
                     <div className="placeholder grid h-48 w-full place-items-center rounded-xl">
-                      {loadingSummary ? '불러오는 중…' : '표시할 데이터가 없습니다.'}
+                      {fetchingSummary ? '불러오는 중…' : '표시할 데이터가 없습니다.'}
                     </div>
                   )}
                 </div>

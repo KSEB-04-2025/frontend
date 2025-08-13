@@ -1,12 +1,13 @@
 'use client';
 
 import React from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import ToggleGroup from '@/components/ui/ToggleGroup';
 import { useDashboard } from '@/store/dashboard';
 import { getABStats, getDefectStats, type DailyAB, type DefectItem } from '@/apis/dashboard';
+
 type CSSVars = React.CSSProperties & { ['--cols']?: number | string };
 
-//사이즈 상수
 const SZ = {
   chartH: 260,
   barAreaH: 160,
@@ -30,84 +31,71 @@ const labelMonth = (iso: string) => `${Number(iso.slice(5, 7))}월`;
 export default function MetricsGrid() {
   const period = useDashboard(s => s.period);
 
-  const [todayA, setTodayA] = React.useState<number | null>(null);
-  const [todayB, setTodayB] = React.useState<number | null>(null);
-  const [todayDef, setTodayDef] = React.useState<number | null>(null);
+  const { data } = useQuery({
+    queryKey: ['metrics', period],
+    queryFn: async () => {
+      const [abList, defectList] = await Promise.all([getABStats(period), getDefectStats(period)]);
 
-  const [abRows, setAbRows] = React.useState<{ label: string; a: number; b: number }[]>([]);
-  const [defRows, setDefRows] = React.useState<{ label: string; defect: number }[]>([]);
-  const [loading, setLoading] = React.useState(false);
-
-  React.useEffect(() => {
-    let alive = true;
-    setLoading(true);
-    (async () => {
-      try {
-        const [abList, defectList] = await Promise.all([
-          getABStats(period),
-          getDefectStats(period),
-        ]);
-        if (period === 'today') {
-          const a = abList.reduce((s, d) => s + (d.acount ?? 0), 0);
-          const b = abList.reduce((s, d) => s + (d.bcount ?? 0), 0);
-          const x = defectList.reduce((s, d) => s + (d.xcount ?? 0), 0);
-          if (!alive) return;
-          setTodayA(a);
-          setTodayB(b);
-          setTodayDef(x);
-          setAbRows([{ label: 'Today', a, b }]);
-          setDefRows([{ label: 'Today', defect: x }]);
-        } else if (period === 'week') {
-          const abPicked = takeRecentByDate<DailyAB>(abList, 4);
-          const dfPicked = takeRecentByDate<DefectItem>(defectList, 4);
-          if (!alive) return;
-          setAbRows(
-            abPicked.map(d => ({ label: labelWeek(d.date), a: d.acount ?? 0, b: d.bcount ?? 0 }))
-          );
-          setDefRows(dfPicked.map(d => ({ label: labelWeek(d.date), defect: d.xcount ?? 0 })));
-          setTodayA(null);
-          setTodayB(null);
-          setTodayDef(null);
-        } else {
-          const abPicked = takeRecentByDate<DailyAB>(abList, 3);
-          const dfPicked = takeRecentByDate<DefectItem>(defectList, 3);
-          if (!alive) return;
-          setAbRows(
-            abPicked.map(d => ({ label: labelMonth(d.date), a: d.acount ?? 0, b: d.bcount ?? 0 }))
-          );
-          setDefRows(dfPicked.map(d => ({ label: labelMonth(d.date), defect: d.xcount ?? 0 })));
-          setTodayA(null);
-          setTodayB(null);
-          setTodayDef(null);
-        }
-      } catch (e) {
-        console.error('Failed to fetch metrics data:', e);
-        if (!alive) return;
-        setAbRows([]);
-        setDefRows([]);
-        setTodayA(null);
-        setTodayB(null);
-        setTodayDef(null);
-      } finally {
-        if (alive) setLoading(false);
+      if (period === 'today') {
+        const a = abList.reduce((s, d) => s + (d.acount ?? 0), 0);
+        const b = abList.reduce((s, d) => s + (d.bcount ?? 0), 0);
+        const x = defectList.reduce((s, d) => s + (d.xcount ?? 0), 0);
+        return {
+          today: { a, b, defect: x },
+          abRows: [{ label: 'Today', a, b }],
+          defRows: [{ label: 'Today', defect: x }],
+        };
       }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, [period]);
 
-  const maxAB = Math.max(1, ...abRows.flatMap(r => [r.a, r.b]));
-  const maxDef = Math.max(1, ...defRows.map(r => r.defect));
+      if (period === 'week') {
+        const abPicked = takeRecentByDate<DailyAB>(abList, 4);
+        const dfPicked = takeRecentByDate<DefectItem>(defectList, 4);
+        return {
+          today: null,
+          abRows: abPicked.map(d => ({
+            label: labelWeek(d.date),
+            a: d.acount ?? 0,
+            b: d.bcount ?? 0,
+          })),
+          defRows: dfPicked.map(d => ({ label: labelWeek(d.date), defect: d.xcount ?? 0 })),
+        };
+      }
+
+      // month
+      const abPicked = takeRecentByDate<DailyAB>(abList, 3);
+      const dfPicked = takeRecentByDate<DefectItem>(defectList, 3);
+      return {
+        today: null,
+        abRows: abPicked.map(d => ({
+          label: labelMonth(d.date),
+          a: d.acount ?? 0,
+          b: d.bcount ?? 0,
+        })),
+        defRows: dfPicked.map(d => ({ label: labelMonth(d.date), defect: d.xcount ?? 0 })),
+      };
+    },
+    refetchInterval: period === 'today' ? 3000 : 10000,
+    placeholderData: keepPreviousData, // v5 권장: 이전 데이터 유지(깜빡임 방지)
+    retry: 1,
+  });
+
+  const abRows = data?.abRows ?? [];
+  const defRows = data?.defRows ?? [];
+  const todayA = data?.today ? data.today.a : null;
+  const todayB = data?.today ? data.today.b : null;
+  const todayDef = data?.today ? data.today.defect : null;
+
+  const maxAB = React.useMemo(() => Math.max(1, ...abRows.flatMap(r => [r.a, r.b])), [abRows]);
+  const maxDef = React.useMemo(() => Math.max(1, ...defRows.map(r => r.defect)), [defRows]);
 
   const renderToday = () => {
-    const a = todayA ?? 0,
-      b = todayB ?? 0,
-      d = todayDef ?? 0;
+    const a = todayA ?? 0;
+    const b = todayB ?? 0;
+    const d = todayDef ?? 0;
     const max = Math.max(1, a, b, d);
 
     return (
-      <div className={`grid h-full min-h-0 grid-cols-12 gap-5`}>
+      <div className="grid h-full min-h-0 grid-cols-12 gap-5">
         {/* Left */}
         <section
           className={`col-span-12 overflow-hidden rounded-lg border border-brand-border bg-box ${SZ.padCard} lg:col-span-7`}
@@ -117,40 +105,29 @@ export default function MetricsGrid() {
             <span className="text-base text-sub">등급별 백분율</span>
           </div>
 
-          {loading ? (
-            <div
-              className="placeholder grid place-items-center rounded-lg"
-              style={{ height: SZ.chartH }}
-            >
-              불러오는 중…
-            </div>
-          ) : (
-            <div
-              className={`mt-3 grid content-end items-end ${SZ.gapLg} grid-cols-3`}
-              style={{ height: SZ.chartH }}
-            >
-              {[
-                { key: 'A', val: a, color: 'bg-brand-a' },
-                { key: 'B', val: b, color: 'bg-brand-b' },
-                { key: 'defect', val: d, color: 'bg-defect' },
-              ].map(item => (
-                <div key={item.key} className="flex flex-col items-center">
-                  <div className="mb-1 text-3xl font-bold text-heading">{item.val ?? '-'}</div>
+          {/* 로딩 UI 제거: 항상 막대 그리되 값이 없으면 0/’-’로 표기 */}
+          <div
+            className={`mt-3 grid content-end items-end ${SZ.gapLg} grid-cols-3`}
+            style={{ height: SZ.chartH }}
+          >
+            {[
+              { key: 'A', val: a, color: 'bg-brand-a' },
+              { key: 'B', val: b, color: 'bg-brand-b' },
+              { key: 'defect', val: d, color: 'bg-defect' },
+            ].map(item => (
+              <div key={item.key} className="flex flex-col items-center">
+                <div className="mb-1 text-3xl font-bold text-heading">{item.val ?? '-'}</div>
+                <div className="flex w-16 items-end justify-center" style={{ height: SZ.barAreaH }}>
                   <div
-                    className="flex w-16 items-end justify-center"
-                    style={{ height: SZ.barAreaH }}
-                  >
-                    <div
-                      className={`w-full rounded-t-md ${item.color}`}
-                      style={{ height: `${((item.val ?? 0) / max) * SZ.barMaxH}px` }}
-                      aria-label={`${item.key} ${item.val ?? '-'}`}
-                    />
-                  </div>
-                  <div className="mt-1 text-base text-sub">{item.key}</div>
+                    className={`w-full rounded-t-md ${item.color} transition-[height] duration-500`}
+                    style={{ height: `${((item.val ?? 0) / max) * SZ.barMaxH}px` }}
+                    aria-label={`${item.key} ${item.val ?? '-'}`}
+                  />
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="mt-1 text-base text-sub">{item.key}</div>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* Right cards */}
@@ -214,14 +191,8 @@ export default function MetricsGrid() {
           </div>
         </div>
 
-        {loading ? (
-          <div
-            className="placeholder grid place-items-center rounded-lg"
-            style={{ height: SZ.chartH }}
-          >
-            불러오는 중…
-          </div>
-        ) : abRows.length === 0 ? (
+        {/* 로딩 UI 제거 */}
+        {abRows.length === 0 ? (
           <div className="placeholder grid h-24 place-items-center rounded-lg">-</div>
         ) : (
           <div
@@ -237,7 +208,7 @@ export default function MetricsGrid() {
                       {r.a}
                     </div>
                     <div
-                      className="mx-auto w-full bg-brand-a"
+                      className="mx-auto w-full bg-brand-a transition-[height] duration-500"
                       style={{ height: `${(r.a / maxAB) * SZ.barMaxH}px` }}
                     />
                   </div>
@@ -247,7 +218,7 @@ export default function MetricsGrid() {
                       {r.b}
                     </div>
                     <div
-                      className="mx-auto w-full bg-brand-b"
+                      className="mx-auto w-full bg-brand-b transition-[height] duration-500"
                       style={{ height: `${(r.b / maxAB) * SZ.barMaxH}px` }}
                     />
                   </div>
@@ -272,14 +243,8 @@ export default function MetricsGrid() {
           </span>
         </div>
 
-        {loading ? (
-          <div
-            className="placeholder grid place-items-center rounded-lg"
-            style={{ height: SZ.chartH }}
-          >
-            불러오는 중…
-          </div>
-        ) : defRows.length === 0 ? (
+        {/* 로딩 UI 제거 */}
+        {defRows.length === 0 ? (
           <div className="placeholder grid h-24 place-items-center rounded-lg">-</div>
         ) : (
           <div
