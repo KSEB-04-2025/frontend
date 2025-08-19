@@ -2,6 +2,8 @@
 
 📍 AI 기반 결함 감지 및 품질 모니터링을 위한 ZEZE ONE 대시보드 프론트엔드 프로젝트입니다.
 
+📍배포 주소 ``https://zezeone-sf.site/``
+
 ---
 
 ## 🛠️ 기술 스택
@@ -50,4 +52,7 @@ NEXT_PUBLIC_API_BASE_URL=https://api.zezeone-sf.site/api
 
 ## 📷 시각 자료
 
-<img width="2560" height="1348" alt="스크린샷 2025-08-13 052327" src="https://github.com/user-attachments/assets/7958f2da-e5da-4c2d-97e9-303c8fe2af92" />
+<img width="2160" height="1536" alt="zezeone-sf site_login(pc)" src="https://github.com/user-attachments/assets/94169566-2965-46ab-ac1c-dd36744d289c" />
+<img width="2160" height="1536" alt="zezeone-sf site_login(pc) (1)" src="https://github.com/user-attachments/assets/7bd159b8-7bc2-47c5-a8ab-4114905a7633" />
+
+
